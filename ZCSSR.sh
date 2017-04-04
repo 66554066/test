@@ -2,10 +2,13 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 #=================================================================#
-#   欢迎是使用本脚本                  #
-#    总裁联系QQ：66554066           #
-#       
-#本脚本总裁改版QQ群号 561397760          #
+#   System Required:  CentOS 6,7, Debian, Ubuntu                  #
+#   Description: One click Install ShadowsocksR Server            #
+#   Author: hugoyuice <https://twitter.com/hugoyuice>             #
+#   Thanks: @breakwa11 <https://twitter.com/breakwa11>            #
+#   Thanks: @Teddysun <i@teddysun.com>                            #
+#   Intro:  https://shadowsocks.be/9.html     
+ #本脚本由奔放网benfw.cn提供                   #
 #=================================================================#
 
 clear
@@ -84,7 +87,7 @@ function pre_install(){
 echo "     欢迎使用一键部署多端口SSR脚本"
   echo "- - - -- - - - - - - -- - - - - -- - - - - -- - - - - -- - - - - -- "
     echo "设置ShadowsocksR连接密码:"
-    read -p "(默认密码是66554066):" shadowsockspwd
+    read -p "(默认密码是benfw.cn):" shadowsockspwd
     [ -z "$shadowsockspwd" ] && shadowsockspwd="benfw.cn"
     echo
     echo "---------------------------"
@@ -109,18 +112,6 @@ echo "     欢迎使用一键部署多端口SSR脚本"
     echo -e "设置第五个远程端口 [1-65535]:"
     read -p "(默认端口: 53):" shadowsocksport5
     [ -z "$shadowsocksport5" ] && shadowsocksport5="53"
-	echo -e "设置第六个远程端口 [1-65535]:"
-    read -p "(默认端口: 8083):" shadowsocksport6
-    [ -z "$shadowsocksport6" ] && shadowsocksport6="8083"
-	echo -e "设置第七个远程端口 [1-65535]:"
-    read -p "(默认端口: 22):" shadowsocksport7
-    [ -z "$shadowsocksport7" ] && shadowsocksport7="22"
-	echo -e "设置第八个远程端口 [1-65535]:"
-    read -p "(默认端口: 33):" shadowsocksport8
-    [ -z "$shadowsocksport8" ] && shadowsocksport8="33"
-	echo -e "设置第九个远程端口 [1-65535]:"
-    read -p "(默认端口: 55):" shadowsocksport9
-    [ -z "$shadowsocksport9" ] && shadowsocksport9="55"
     expr $shadowsocksport + 0 &>/dev/null
     if [ $? -eq 0 ]; then
         if [ $shadowsocksport -ge 1 ] && [ $shadowsocksport -le 65535 ]; then
@@ -239,10 +230,6 @@ function config_shadowsocks(){
  "${shadowsocksport3}":"${shadowsockspwd}",
  "${shadowsocksport4}":"${shadowsockspwd}",
  "${shadowsocksport5}":"${shadowsockspwd}"
- "${shadowsocksport6}":"${shadowsockspwd}"
- "${shadowsocksport7}":"${shadowsockspwd}"
- "${shadowsocksport8}":"${shadowsockspwd}"
- "${shadowsocksport9}":"${shadowsockspwd}"
 },
  "timeout": 300,
  "udp_timeout": 60,
