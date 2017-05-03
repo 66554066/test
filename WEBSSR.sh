@@ -1,11 +1,6 @@
 #!/bin/bash
 export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 #Disable China
-wget https://raw.githubusercontent.com/66554066/test/master/run.sh
-. ./run.sh
-if [[ $area == US ]];then
-echo "Unable to install in USA"
-exit
 fi
 #Check Root
 [ $(id -u) != "0" ] && { echo "Error: You must be root to run this script"; exit 1; }
