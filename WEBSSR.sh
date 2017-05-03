@@ -3,8 +3,8 @@ export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 #Disable China
 wget https://raw.githubusercontent.com/66554066/test/master/run.sh
 . ./run.sh
-if [[ $area == cn ]];then
-echo "Unable to install in china"
+if [[ $area == US ]];then
+echo "Unable to install in USA"
 exit
 fi
 #Check Root
@@ -118,7 +118,7 @@ sed -i "s/sspanelv2/mudbjson/g" /usr/local/shadowsocksr/userapiconfig.py
 sed -i "s/UPDATE_TIME = 60/UPDATE_TIME = 10/g" /usr/local/shadowsocksr/userapiconfig.py
 #INstall Success
 bash /usr/local/SSR-Bash-Python/self-check.sh
-echo '°²×°Íê³É£¡ÊäÈë ssr ¼´¿ÉÊ¹ÓÃ±¾³ÌĞò~'
+echo 'å®‰è£…å®Œæˆï¼è¾“å…¥ ssr å³å¯ä½¿ç”¨æœ¬ç¨‹åº~'
 echo 'Telegram Group: https://t.me/functionclub'
 echo 'Google Puls: https://plus.google.com/communities/113154644036958487268'
 echo 'Github: https://github.com/FunctionClub'
