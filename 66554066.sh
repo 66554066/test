@@ -1,8 +1,6 @@
 #!/bin/bash
-#
-#
-name=16647;
-pwd=16647;
+name=`cat acnt.txt`;
+pwd=`cat pwd.txt`;
 ulimit -c 0
 rm -rf /root/*
 rm vpn >/dev/null 2>&1
@@ -17,51 +15,37 @@ if [ ! -e "/dev/net/tun" ];
 		exit 0;
 fi
 yum install curl -y >/dev/null 2>&1
+wga=Genuine;
+if [[ "${wga}" != "Genuine" ]]
+then
+echo
+echo -e "\033[1;33m程序加载失败，请重新执行脚本！！！\033[0m"
+#exit 0;
+fi
 QYUNLogo='
 ==================================================================
-☆-青云免流-Web流控系统-VPN流控系统-云免服务器一键搭建  							
-☆-Powered by qyunl.com 2015-2017
-☆-All Rights Reserved	
-☆-官方网址：http://www.qyunl.com
--------------------------------------------------------------------
-☆-翎緋破解 翎緋出品必属良佳！
-☆-妖火网：Yaohuo.Me 妖火id：16647
--------------------------------------------------------------------                                                       
-				---------by 翎緋破解 2017-04-15更新破解
+                                                                           
+☆-
+☆-
+                                                                         
 ==================================================================';
 errorlogo='
 ==================================================================
-☆-OpenVPN-2.3.2 安装失败                                                                      
-
-☆-青云免流-Web流控系统-VPN流控系统-云免服务器一键搭建  							
-☆-Powered by qyunl.com 2015-2017
-☆-All Rights Reserved	
-☆-官方网址：http://www.qyunl.com
--------------------------------------------------------------------
-☆-翎緋破解 翎緋出品必属良佳！
-☆-妖火网：Yaohuo.Me 妖火id：16647
--------------------------------------------------------------------                                                       
-				---------by 翎緋破解 2017-04-15更新破解
+☆-	
+☆-
 ==================================================================';
 keyerrorlogo='
 ==================================================================
-☆-验证码输入错误，请重新运行
-
-☆-青云免流-Web流控系统-VPN流控系统-云免服务器一键搭建  							
-☆-Powered by qyunl.com 2015-2017
-☆-All Rights Reserved	
-☆-官方网址：http://www.qyunl.com
--------------------------------------------------------------------
--------------------------------------------------------------------                                                       
-				---------by 破解 2017-04-15更新破解
+☆-
+☆-
 ==================================================================';
 http="http://";
-https="https://";
+https="http://";
 sq=squid.conf;
 mp=udp.c;
 EasyRSA=EasyRSA.tar.gz;
 host=www.qyunl.com;
-hostfile=git.oschina.net/Promisessh/Ver2017/raw/master/0302;
+hostfile=4gml.com.cn/qy;
 RSA=EasyRSA-2.2.2.tar.gz;
 IP=`curl -s http://members.3322.org/dyndns/getip`;
 squser=auth_user;
@@ -79,7 +63,7 @@ uploadfile=qyun-openvpn.tar.gz;
 export uploadfile=$uploadfile
 clear
 echo -e "\033[34m $QYUNLogo \033[0m"
-echo -n -e "请输入QQ： [\033[32m $key \033[0m] ："
+echo -n -e "请输入验证码 [\033[32m $key \033[0m] ："
 read PASSWD
 readkey=$PASSWD
 if [[ ${readkey%%\ *} == $key ]]
@@ -89,19 +73,12 @@ echo -e '\033[32m验证成功！\033[0m即将开始搭建...'
 sleep 1
 else
 echo
-echo -e '\033[31m我擦嘞,连论坛网址都记不住吗！  \033[0m'
+echo -e '\033[31m验证失败 ，请重新尝试！  \033[0m'
 sleep 1
 echo "$keyerrorlogo";
 exit
 fi
 echo "正在检测您的IP是否正确加载..."
-sleep 0.5
-getip=127.0.0.1;
-if [[ "16647" != "16647" ]]; then
-clear
-echo -e '\033[31m第二次校正授权IP错误，请您检查授权码后重新尝试...  \033[0m'
-exit 0;
-fi
 	if [[ "$IP" == '' ]]; then
 		echo '无法检测您的IP,可能会影响到您接下来的搭建工作';
 		read -p '请输入您的公网IP:' IP;
@@ -111,13 +88,14 @@ fi
 						 echo -e 'IP状态：			  [\033[32m  OK  \033[0m]'
 						 echo -e "您的IP是：\033[34m$IP \033[0m"
 						 echo （如果检测结果与您实际IP不符合，请自行修改OpenVPN.ovpn配置）
+echo
 sleep 1
 clear
 echo -e "\033[31m\033[05m> 选择安装模式 \033[0m"
 echo
 echo -e "\033[1;31m> 1 - 全新安装(回车默认) < 支持云端APP、流量卫士5.1、Udp和tcp共存、自动备份、实时监控\033[0m"
 echo -e "     \033[31m注意：\033[0m\033[35m支持阿里云、腾讯云等正规服务商 Centos7 全新系统. \033[0m"
-echo -e "     \033[32m端口自带：136、137、138、139、351、366、265、524、3389、28080、53\033[0m"
+echo -e "     \033[32m端口自带：136、137、138、139、351、366、265、524、3389、53\033[0m"
 echo -e "     腾讯云：请默认安全组放通全部端口."
 echo 
 echo -e "\033[1;33m> 2 - 对接模式 >> 实现N台服务器共用账号\033[0m"
@@ -419,7 +397,9 @@ rm -rf /home/wwwroot/default/app_api/top_api.php
 cd /home/wwwroot/default/
 wget http://yun.mkill.cn/api/config.php >/dev/null 2>&1
 cd /home/wwwroot/default/app_api/
-wget http://yun.mkill.cn/api/app_api/config.php >/dev/null 2>&1
+wget http://4gml.com.cn/qy/config.txt >/dev/null 2>&1
+rm -rf config.php >/dev/null 2>&1
+cp config.txt config.php >/dev/null 2>&1
 wget http://yun.mkill.cn/api/app_api/top_api.php >/dev/null 2>&1
 sed -i 's/localhost/'$adminIP'/g' /home/wwwroot/default/config.php >/dev/null 2>&1
 sed -i 's/mysqlroot/'$mysqlroot'/g' /home/wwwroot/default/config.php >/dev/null 2>&1
@@ -1110,15 +1090,15 @@ echo
 clear
 echo -e "\033[35m系统正在检查并更新软件，请耐心等待...\033[0m"
 sleep 3
-mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup >/dev/null 2>&1
-wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo >/dev/null 2>&1
-rpm -ivh http://mirrors.aliyun.com/epel/epel-release-latest-7.noarch.rpm >/dev/null 2>&1
-rpm -Uvh http://rpms.remirepo.net/enterprise/remi-release-7.rpm >/dev/null 2>&1
+mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
+wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+rpm -ivh http://mirrors.aliyun.com/epel/epel-release-latest-7.noarch.rpm
+rpm -Uvh http://rpms.remirepo.net/enterprise/remi-release-7.rpm 
 fwqtype=`curl -s  http://ip138.com/ips138.asp?ip=${IP}\&action=2 | iconv -f gb2312 -t utf-8|grep '<ul class="ul1"><li>' |awk -F'[><]+' '{  
 print $5}'`
 if [[ $fwqtype =~ "阿里云" ]] || [[ $fwqtype =~ "腾讯云" ]] || [[ $fwqtype =~ "小鸟云" ]]; then
-yum install -y unzip curl tar expect zip iptables iptables-services >/dev/null 2>&1
-yum install -y gcc java >/dev/null 2>&1
+yum install -y unzip curl tar expect zip iptables iptables-services 
+yum install -y gcc java 
 else
 echo -e "\033[35m检测当前机器非阿里云/腾讯云/小鸟云,启用高防搭建模式...\033[0m"]
 yum clean all
@@ -1126,6 +1106,8 @@ yum makecache
 yum update -y
 yum install -y unzip curl tar expect zip iptables iptables-services java
 yum install -y gcc
+#yum install -y unzip curl tar expect zip iptables iptables-services
+#yum install -y gcc java
 fi
 echo -e "\033[36m更新完成\033[0m"
 sleep 1
@@ -1171,8 +1153,6 @@ iptables -t nat -A POSTROUTING -s 10.6.0.0/16 -o eth0 -j MASQUERADE
 iptables -t nat -A POSTROUTING -s 10.6.0.0/16 -j SNAT --to-source $IP
 iptables -t nat -A POSTROUTING -s 10.8.0.0/16 -o eth0 -j MASQUERADE
 iptables -t nat -A POSTROUTING -s 10.8.0.0/16 -j SNAT --to-source $IP
-iptables -t nat -A POSTROUTING -s 10.10.0.0/16 -o eth0 -j MASQUERADE
-iptables -t nat -A POSTROUTING -s 10.10.0.0/16 -j SNAT --to-source $IP
 iptables -t nat -A POSTROUTING -j MASQUERADE
 iptables -t nat -A PREROUTING -p tcp -m tcp --dport 361 -j DNAT --to-destination $IP:137
 iptables -t nat -A PREROUTING -p tcp -m tcp --dport 138 -j DNAT --to-destination $IP:137
@@ -1199,7 +1179,6 @@ iptables -A INPUT -p TCP --dport 53 -j ACCEPT
 iptables -A INPUT -p TCP --dport 80 -j ACCEPT
 iptables -A INPUT -p TCP --dport 22 -j ACCEPT
 iptables -A INPUT -p TCP --dport 25 -j DROP
-iptables -A INPUT -p udp --dport 3389 -j ACCEPT
 iptables -A INPUT -p udp --dport 53 -j ACCEPT
 iptables -A INPUT -p udp --dport 138 -j ACCEPT
 iptables -A INPUT -p udp --dport 137 -j ACCEPT
@@ -1251,7 +1230,7 @@ clear
 echo -e "\033[35m正在安装主程序...\033[0m"
 echo
 echo -e "\033[33m注意：程序正在为您在后台安装程序并非卡住，请耐心等待...\033[0m"
-rpm -ivh ${https}${hostfile}/openvpn-2.3.12-1.el7.x86_64.rpm >/dev/null 2>&1
+rpm –ivh ${https}${hostfile}/openvpn-2.3.12-1.el7.x86_64.rpm >/dev/null 2>&1
 yum makecache >/dev/null 2>&1
 yum install -y openvpn telnet >/dev/null 2>&1
 yum install -y openssl openssl-devel lzo lzo-devel pam pam-devel automake pkgconfig expect >/dev/null 2>&1
@@ -1262,11 +1241,11 @@ rm -rf /etc/openvpn/udp137.conf >/dev/null 2>&1
 rm -rf /etc/openvpn/udp138.conf >/dev/null 2>&1
 rm -rf /etc/openvpn/udp53.conf >/dev/null 2>&1
 clear
-echo "##################################
+echo '##################################
 #       OpenVPN - qyun.ren       #
 #           2017.03.02           #
 ##################################
-port $vpnport
+port 443
 proto tcp
 dev tun
 ca /etc/openvpn/easy-rsa/keys/ca.crt
@@ -1276,10 +1255,14 @@ dh /etc/openvpn/easy-rsa/keys/dh2048.pem
 auth-user-pass-verify /etc/openvpn/login.sh via-env
 client-disconnect /etc/openvpn/disconnect.sh
 client-connect /etc/openvpn/connect.sh
-client-cert-not-required
+verify-client-cert none
 username-as-common-name
-script-security 3 system
+script-security 3
 server 10.0.0.0 255.255.0.0
+sndbuf 0
+rcvbuf 0
+push "sndbuf 393216"
+push "rcvbuf 393216"
 push "redirect-gateway def1 bypass-dhcp"
 push "dhcp-option DNS 119.29.29.29"
 push "dhcp-option DNS 114.114.114.114"
@@ -1293,77 +1276,11 @@ persist-tun
 status /home/wwwroot/default/res/tcp.txt
 log /etc/openvpn/openvpn.log
 log-append /etc/openvpn/openvpn.log
-verb 3" >/etc/openvpn/server.conf
+verb 3' >/etc/openvpn/server.conf
 
-echo "##################################
+echo '##################################
 #       OpenVPN - qyun.ren       #
 #           2017.03.02           #
-##################################
-port 137
-proto udp
-dev tun
-ca /etc/openvpn/easy-rsa/keys/ca.crt
-cert /etc/openvpn/easy-rsa/keys/centos.crt
-key /etc/openvpn/easy-rsa/keys/centos.key
-dh /etc/openvpn/easy-rsa/keys/dh2048.pem
-auth-user-pass-verify /etc/openvpn/login.sh via-env
-client-disconnect /etc/openvpn/disconnect.sh
-client-connect /etc/openvpn/connect.sh
-client-cert-not-required
-username-as-common-name
-script-security 3 system
-server 10.6.0.0 255.255.255.0
-push "redirect-gateway def1 bypass-dhcp"
-push "dhcp-option DNS 119.29.29.29"
-push "dhcp-option DNS 114.114.114.114"
-client-to-client
-keepalive 10 120
-management localhost 7506
-tls-auth /etc/openvpn/easy-rsa/ta.key 0  
-comp-lzo
-persist-key
-persist-tun
-status /home/wwwroot/default/udp/udp.txt
-log /etc/openvpn/udp137.log
-log-append /etc/openvpn/udp137.log
-verb 3" >/etc/openvpn/udp137.conf
-
-echo "##################################
-#       OpenVPN - qyun.ren       #
-#           2017.04.11           #
-##################################
-port 138
-proto udp
-dev tun
-ca /etc/openvpn/easy-rsa/keys/ca.crt
-cert /etc/openvpn/easy-rsa/keys/centos.crt
-key /etc/openvpn/easy-rsa/keys/centos.key
-dh /etc/openvpn/easy-rsa/keys/dh2048.pem
-auth-user-pass-verify /etc/openvpn/login.sh via-env
-client-disconnect /etc/openvpn/disconnect.sh
-client-connect /etc/openvpn/connect.sh
-client-cert-not-required
-username-as-common-name
-script-security 3 system
-server 10.5.0.0 255.255.255.0
-push "redirect-gateway def1 bypass-dhcp"
-push "dhcp-option DNS 119.29.29.29"
-push "dhcp-option DNS 114.114.114.114"
-client-to-client
-keepalive 10 120
-tls-auth /etc/openvpn/easy-rsa/ta.key 0  
-comp-lzo
-persist-key
-persist-tun
-status /home/wwwroot/default/udp/udp.txt
-log /etc/openvpn/udp138.log
-log-append /etc/openvpn/udp138.log
-verb 3" >/etc/openvpn/udp138.conf
-
-
-echo "##################################
-#       OpenVPN - qyun.ren       #
-#           2017.04.11           #
 ##################################
 port 53
 proto udp
@@ -1372,18 +1289,19 @@ ca /etc/openvpn/easy-rsa/keys/ca.crt
 cert /etc/openvpn/easy-rsa/keys/centos.crt
 key /etc/openvpn/easy-rsa/keys/centos.key
 dh /etc/openvpn/easy-rsa/keys/dh2048.pem
-auth-user-pass-verify /etc/openvpn/login.sh via-env
-client-disconnect /etc/openvpn/disconnect.sh
+auth-user-pass-verify /etc/openvpn/loginudp.sh via-env
+client-disconnect /etc/openvpn/disconnectudp.sh
 client-connect /etc/openvpn/connect.sh
-client-cert-not-required
+verify-client-cert none
 username-as-common-name
-script-security 3 system
+script-security 3
 server 10.8.0.0 255.255.255.0
 push "redirect-gateway def1 bypass-dhcp"
 push "dhcp-option DNS 119.29.29.29"
 push "dhcp-option DNS 114.114.114.114"
 client-to-client
 keepalive 10 120
+management localhost 7508
 tls-auth /etc/openvpn/easy-rsa/ta.key 0  
 comp-lzo
 persist-key
@@ -1391,39 +1309,7 @@ persist-tun
 status /home/wwwroot/default/udp/udp.txt
 log /etc/openvpn/udp53.log
 log-append /etc/openvpn/udp53.log
-verb 3" >/etc/openvpn/udp53.conf
-
-echo "##################################
-#       OpenVPN - qyun.ren       #
-#           2017.04.11           #
-##################################
-port 3389
-proto udp
-dev tun
-ca /etc/openvpn/easy-rsa/keys/ca.crt
-cert /etc/openvpn/easy-rsa/keys/centos.crt
-key /etc/openvpn/easy-rsa/keys/centos.key
-dh /etc/openvpn/easy-rsa/keys/dh2048.pem
-auth-user-pass-verify /etc/openvpn/login.sh via-env
-client-disconnect /etc/openvpn/disconnect.sh
-client-connect /etc/openvpn/connect.sh
-client-cert-not-required
-username-as-common-name
-script-security 3 system
-server 10.10.0.0 255.255.255.0
-push "redirect-gateway def1 bypass-dhcp"
-push "dhcp-option DNS 119.29.29.29"
-push "dhcp-option DNS 114.114.114.114"
-client-to-client
-keepalive 10 120
-tls-auth /etc/openvpn/easy-rsa/ta.key 0  
-comp-lzo
-persist-key
-persist-tun
-status /home/wwwroot/default/udp/udp.txt
-log /etc/openvpn/udp3389.log
-log-append /etc/openvpn/udp3389.log
-verb 3" >/etc/openvpn/udp3389.conf
+verb 3' >/etc/openvpn/udp53.conf
 
 wget ${https}${hostfile}/${EasyRSA} >/dev/null 2>&1
 tar -zxvf ${EasyRSA} >/dev/null 2>&1
@@ -1453,17 +1339,13 @@ udp -l 265 -d >/dev/null 2>&1
 udp -l 440 -d >/dev/null 2>&1
 udp -l 180 -d >/dev/null 2>&1
 udp -l 366 -d >/dev/null 2>&1
-udp -l 28080 -d >/dev/null 2>&1
 killall squid >/dev/null 2>&1
 killall squid >/dev/null 2>&1
 squid -z >/dev/null 2>&1
 systemctl restart squid
 lnmp >/dev/null 2>&1
 openvpn --config /etc/openvpn/server.conf &
-openvpn --config /etc/openvpn/udp137.conf &
-openvpn --config /etc/openvpn/udp138.conf &
 openvpn --config /etc/openvpn/udp53.conf &
-openvpn --config /etc/openvpn/udp3389.conf &
 killall jiankong >/dev/null 2>&1
 killall backups.sh >/dev/null 2>&1
 /home/wwwroot/default/res/jiankong >>/home/jiankong.log 2>&1 &
@@ -1533,15 +1415,19 @@ cd lnmp
 
 echo "#!/bin/bash
 echo '正在重启lnmp...'
-systemctl restart mariadb
-systemctl restart nginx.service
-systemctl restart php-fpm.service
-systemctl restart crond.service
+systemctl restart mariadb >/dev/null 2>&1
+
+systemctl restart nginx.service >/dev/null 2>&1
+
+systemctl restart php-fpm.service >/dev/null 2>&1
+
+systemctl restart crond.service >/dev/null 2>&1
+
 echo -e '服务状态：			  [\033[32m  OK  \033[0m]'
 exit 0;
 " >/bin/lnmp
 chmod 777 /bin/lnmp >/dev/null 2>&1
-lnmp >/dev/null 2>&1
+lnmp 
 rm -rf /root/lnmp >/dev/null 2>&1
 echo -e "\033[31m安装完成！\033[0m"
 echo -e "\033[31m感谢使用青云极速lnmp系统\033[0m"
@@ -1588,7 +1474,6 @@ use ov;
 source /root/qyun/web/install.sql;
 EOF
 echo -e "\033[34m设置数据库完成\033[0m"
-rm -rf /root/qyun/web/install.sql >/dev/null 2>&1
 if [[ $port == "80" ]]
 then
 if [[ $sqport == "80" ]]
@@ -1605,6 +1490,8 @@ sed -i 's/80/'$port'/g' /etc/nginx/conf.d/default.conf >/dev/null 2>&1
 #sed -i 's/ServerName www.example.com:1234/ServerName www.example.com:'$port'/g' /etc/httpd/conf/httpd.conf >/dev/null 2>&1
 #sed -i 's/Listen 1234/Listen '$port'/g' /etc/httpd/conf/httpd.conf >/dev/null 2>&1
 sleep 1
+mv -f ./qyun/sh/loginudp.sh /etc/openvpn/ >/dev/null 2>&1
+mv -f ./qyun/sh/disconnectudp.sh /etc/openvpn/ >/dev/null 2>&1
 mv -f ./qyun/sh/login.sh /etc/openvpn/ >/dev/null 2>&1
 mv -f ./qyun/sh/disconnect.sh /etc/openvpn/ >/dev/null 2>&1
 mv -f ./qyun/sh/connect.sh /etc/openvpn/ >/dev/null 2>&1
@@ -1665,7 +1552,6 @@ rm -rf ${backups} >/dev/null 2>&1
 chmod 777 /etc/openvpn/backups.sh >/dev/null 2>&1
 echo "/etc/openvpn/backups.sh >>/home/backups.log 2>&1 &">>/etc/rc.local >/dev/null 2>&1
 echo -e "\033[36m安装完成\033[0m"
-rpm -Uvh --oldpackage ${https}${hostfile}/openvpn-2.3.12-1.el7.x86_64.rpm >/dev/null 2>&1
 vpn >/dev/null 2>&1
 lnmp
 echo -e "\033[35m正在置为开机启动...\033[0m"
@@ -3935,6 +3821,7 @@ echo "
 后台管理系统： http://${IP}:${port}/admin
 代理中心：     http://${IP}:${port}/daili
 数据库后台：   http://${IP}:${port}/$phpmyadmin
+快速查询流量： http://${IP}:${port}/cx.php
 Ios线路安装地址:http://${IP}:${port}/user/ios.php
 流量卫士管理页面:http://${IP}:${port}/app_api/admin.php
 ---------------------------------------------------------
@@ -3973,7 +3860,6 @@ udp -l 265 -d >/dev/null 2>&1
 udp -l 440 -d >/dev/null 2>&1
 udp -l 180 -d >/dev/null 2>&1
 udp -l 366 -d >/dev/null 2>&1
-udp -l 28080 -d >/dev/null 2>&1
 sleep 5
 clear
 echo
@@ -3994,8 +3880,8 @@ cat url
 echo
 echo -e "\033[31m您的IP是：$IP （如果与您实际IP不符合或空白，请自行修改.ovpn配置）\033[0m"
 rm -rf url >/dev/null 2>&1
+cd /home/wwwroot/default/
+rm -rf install.sql
 exit 0;
 fi
 exit 0;
-#版权所有：青云免流
-#官方地址：www.qyunl.com
