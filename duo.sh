@@ -233,8 +233,8 @@ function config_shadowsocks(){
 },
  "timeout": 300,
  "udp_timeout": 60,
- "method": "chacha20",
- "protocol": "auth_sha1",
+ "method": "aes-256-cfb",
+ "protocol": "origin",
  "protocol_param": "",
  "obfs": "http_simple",
  "obfs_param": "",
@@ -280,9 +280,9 @@ function install_ss(){
         echo -e "连接密码: \033[41;37m ${shadowsockspwd} \033[0m"
         echo -e "本地 IP: \033[41;37m 127.0.0.1 \033[0m"
         echo -e "本地端口: \033[41;37m 1080 \033[0m"
-        echo -e "协议: \033[41;37m auth_sha1 \033[0m"
+        echo -e "协议: \033[41;37m origin \033[0m"
         echo -e "混淆方式: \033[41;37m http_simple \033[0m"
-        echo -e "加密方法: \033[41;37m chacha20 \033[0m"
+        echo -e "加密方法: \033[41;37m es-256-cfb \033[0m"
         echo
         echo "欢迎访问奔放网:http://benfw.cn"
         echo "基于shadowsocks.be的脚本修改版"
