@@ -1,0 +1,51 @@
+#!/bin/bash
+cd /root
+echo =======================
+echo "===  正在启动请稍等 ==="
+echo -e "===   \033[31m Loading... \033[0m  ==="
+echo =======================
+tj=$(curl -s http://api.webday.cn/tj.txt)
+Ver=$(curl -s http://api.webday.cn/Ver.txt)
+clear
+sleep 1
+echo -e "\t ============================================================="
+echo
+echo -e "\t 感谢使用 “\033[35m Dios \033[0m” 一键SSR脚本"
+echo
+echo -e "\t 已采用\033[36m 【腾讯云加速】支持【国内外一键搭建】修复【联网】\033[0m "
+echo
+echo -e "\t 妖火网：yaohuo.me \t Or \t 91yun"
+echo
+echo
+echo -e "\t \033[32m \t \t Ver:${Ver} \033[0m SSR一键搭建 By “\033[35m Dios \033[0m”"
+echo
+echo -e "\t \t \t \t ——————— \033[32m脚本已经提供超过${tj}次安装\033[0m"
+echo
+echo -e "\t ============================================================="
+echo -e "\t 已通过 \033[36m “腾讯云”/“待反馈”/“待反馈”/“待反馈”/“亚马逊” \033[0m 安装测试"
+echo
+echo -e "\t \033[32m 1.单端口SSR一键搭建 \033[0m"
+echo
+echo -e "\t \033[33m 2.多端口SSR一键搭建 \033[0m"
+echo
+echo -e "\t \033[34m 3.高级调试安装模式\033[0m \033[31m [不推荐] \033[0m"
+echo
+echo -e "\t \033[31m x.卸载SSR \033[0m"
+echo
+echo
+echo -e  "\033[34m 请选择 [ 1 , 2 , 3 或 x ] 进行下一步安装！\033[0m
+
+ >请选择安装类型: "
+read az
+  case $az in
+    1) wget -q http://service.webday.cn/SSR-one && bash SSR-one
+       ;;
+    2) wget -q http://service.webday.cn/DSSR && bash DSSR
+       ;;
+    3) wget -q http://service.webday.cn/GJ && bash GJ
+       ;;
+    x) wget -q http://service.webday.cn/SSR-one && bash SSR-one uninstall
+       ;;
+    *)  echo -e "\033[31m 错误：只能选择[ 1 , 2 , 3 或 x ]！！\033[0m"
+       ;;
+  esac
