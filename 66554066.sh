@@ -1,3887 +1,846 @@
 #!/bin/bash
-name=`cat acnt.txt`;
-pwd=`cat pwd.txt`;
+
+#
+# ------------------by 飞跃
+#                 QQ：1797106720
+
+function Kyunhead() {
+# 环境变量 *******
+clear 
 ulimit -c 0
-rm -rf /root/*
-rm vpn >/dev/null 2>&1
-rm -rf $0 
-clear
-echo "程序载入中，请稍后..."
-if [ ! -e "/dev/net/tun" ];
-    then
-        echo
-        echo -e "安装出错 [原因：\033[31m TUN/TAP虚拟网卡不存在 \033[0m]"
-        echo "  网易蜂巢容器官方已不支持安装使用"
-		exit 0;
-fi
-yum install curl -y >/dev/null 2>&1
-wga=Genuine;
-if [[ "${wga}" != "Genuine" ]]
-then
-echo
-echo -e "\033[1;33m程序加载失败，请重新执行脚本！！！\033[0m"
-#exit 0;
-fi
-QYUNLogo='
-==================================================================
-                                                                           
-☆-
-☆-
-                                                                         
-==================================================================';
-errorlogo='
-==================================================================
-☆-	
-☆-
-==================================================================';
-keyerrorlogo='
-==================================================================
-☆-
-☆-
-==================================================================';
-http="http://";
-https="http://";
-sq=squid.conf;
-mp=udp.c;
-EasyRSA=EasyRSA.tar.gz;
-host=www.qyunl.com;
-hostfile=4gml.com.cn/qy;
-RSA=EasyRSA-2.2.2.tar.gz;
-IP=`curl -s http://members.3322.org/dyndns/getip`;
-squser=auth_user;
-key='66554066';
-sysctl=sysctl.conf;
-peizhifile=peizhi.zip;
-upload=transfer.sh;
-jiankongfile=jiankong.zip;
-lnmpfile='qyun-lnmp.zip';
-webfile='qyun-web.zip';
-backups='backups.zip';
-phpmyadmin=sql$RANDOM$RANDOM;
-llwswebfile='llws-web.zip';
-uploadfile=qyun-openvpn.tar.gz;
-export uploadfile=$uploadfile
-clear
-echo -e "\033[34m $QYUNLogo \033[0m"
-echo -n -e "请输入验证码 [\033[32m $key \033[0m] ："
-read PASSWD
-readkey=$PASSWD
-if [[ ${readkey%%\ *} == $key ]]
-then
-echo 
-echo -e '\033[32m验证成功！\033[0m即将开始搭建...'
-sleep 1
+echo && echo 'Loading...'
+trap exit SIGTSTP
+rm -rf $0
+yum install curl net-tools procps-ng -y >/dev/null 2>&1
+KyLogo='
+=====================================================    
+                                     
+☆-欢迎使用快云免流第六期流控搭建脚本 
+                                                        
+
+=====================================================';
+YzError='
+=====================================================  
+
+☆-你输入的官网验证失败，安装服务被终止          
+	           
+☆-Powered by kuaiyum.com 2017 All Rights Reserved     
+      
+☆-交流群：547563252     欢迎你的加入                                    
+=====================================================';
+HmdLogo='
+=====================================================  
+
+☆-由于你的IP在黑名单中，安装服务被终止          
+	           
+☆-Powered by kuaiyum.com 2017 All Rights Reserved     
+      
+☆-交流群：547563252     欢迎你的加入                                    
+=====================================================';
+BuyLogo='
+=====================================================                                                                      
+             快云免流-全新一代流控系统            
+                     温馨提示：                   
+    为了您服务器的稳定和安全，请勿非法更新改程序                           
+               支持正版，抵制盗版                 
+         购买地址：http://kuaiyum.com/buy/        
+====================================================='; 
+porxy='udp.c';export porxy=$porxy
+web='https://';export web=$web
+EasyRSA=easy-rsa.zip;export EasyRSA=$EasyRSA
+webs='https://';export webs=$webs
+O=openvpn-2.3.12-1.el7.x86_64.rpm;export O=$O
+KyWEB="WEB_N17-6.0.zip";export KyWEB=$KyWEB
+sql=mysql_$RANDOM;export sql=$sql
+peizhi='peizhi.zip';export peizhi=$peizhi
+phpmyadmin=phpmyadmin.tar.gz;export phpmyadmin=$phpmyadmin
+IP=`wget http://members.3322.org/dyndns/getip -O - -q ; echo`;
+Host='gitee.com/marisn/kuaiyun/raw/master';export Host=$Host
+# Ksq1=`curl -s http://kyun.kuaiyum.com:8888/Check/api.php?act=cx\&ip=$IP`;
+# Ksq2=`curl -s http://kyun.kuaiyum.com:8888/Check/api.php?act=hmd\&ip=$IP`;
+localserver=`curl -s ip.cn`;fwq=`echo $localserver|awk '{print $4}'`;export fwq=$fwq
+wa=`ifconfig`;wb=`echo $wa|awk '{print $1}'`;wangka=${wb/:/};export wangka=$wangka
+if test -f /etc/os-release ;then
+	OS_VERSION=`cat /etc/os-release |awk -F'[="]+' '/^VERSION_ID=/ {print $2}'`
+	if test $OS_VERSION != "7" ;then
+		echo -e "\n当前系统版本为：\033[31mCentOS $OS_VERSION\033[0m\n"
+		echo "暂不支持该系统安装"
+		echo "请更换 CentOS 7.0-7.2 系统进行安装"
+		exit 1
+	fi
+elif [ -f /etc/redhat-release ];then
+	OS_VERSION=`cat /etc/redhat-release |grep -Eos '\b[0-9]+\S*\b' |cut -d'.' -f1`
+	if test $OS_VERSION != "7" ;then
+		echo -e "\n当前系统版本为：\033[31mCentOS $OS_VERSION\033[0m\n"
+		echo "暂不支持该系统安装"
+		echo "请更换 CentOS 7.0-7.2 系统进行安装"
+		exit 1
+	fi
 else
-echo
-echo -e '\033[31m验证失败 ，请重新尝试！  \033[0m'
-sleep 1
-echo "$keyerrorlogo";
-exit
+	echo -e "当前系统版本为：\033[31m未知\033[0m\n"
+	echo "暂不支持该系统安装"
+	echo "请更换 CentOS 7.0-7.2 系统进行安装"
+	exit
+	fi
+return 1
+}
+
+function KyunApp() {
+echo && echo "正在准备Java环境..."
+if [ ! -e "/usr/bin/java" ];then
+  yum install -y java >/dev/null 2>&1
 fi
-echo "正在检测您的IP是否正确加载..."
-	if [[ "$IP" == '' ]]; then
-		echo '无法检测您的IP,可能会影响到您接下来的搭建工作';
-		read -p '请输入您的公网IP:' IP;
-		[[ "$IP" == '' ]] && InputIPAddress;
-	fi;
-	[[ "$IP" != '' ]] && 
-						 echo -e 'IP状态：			  [\033[32m  OK  \033[0m]'
-						 echo -e "您的IP是：\033[34m$IP \033[0m"
-						 echo （如果检测结果与您实际IP不符合，请自行修改OpenVPN.ovpn配置）
-echo
-sleep 1
-clear
-echo -e "\033[31m\033[05m> 选择安装模式 \033[0m"
-echo
-echo -e "\033[1;31m> 1 - 全新安装(回车默认) < 支持云端APP、流量卫士5.1、Udp和tcp共存、自动备份、实时监控\033[0m"
-echo -e "     \033[31m注意：\033[0m\033[35m支持阿里云、腾讯云等正规服务商 Centos7 全新系统. \033[0m"
-echo -e "     \033[32m端口自带：136、137、138、139、351、366、265、524、3389、53\033[0m"
-echo -e "     腾讯云：请默认安全组放通全部端口."
-echo 
-echo -e "\033[1;33m> 2 - 对接模式 >> 实现N台服务器共用账号\033[0m"
-echo
-echo -e "\033[1;34m> 3 - 代理APP  >> 可给代理定制APP\033[0m"
-echo
-echo -e "\033[1;35m> 4 - 加速测速 >> 加速测速脚本\033[0m"
-echo
-echo -e "\033[1;36m> 5 - 备份恢复 >> 备份和恢复青云证书和数据库、以便重新搭建\033[0m"
-echo
-echo -e "\033[1;32m> 6 - 导入线路 >> 一键导入线路到云端\033[0m"
-echo
-echo -e "\033[1;37m> x - 卸载. \033[0m"
-echo
-echo -n -e "请输入对应数字:"
-read installslect
-if [[ "$installslect" == "6" ]]
-then
-if [ ! -e "/home/wwwroot/default/user/app_api.php" ];then
-echo "程序执行失败，您的服务器还未搭建最新版青云！"
-exit 0;
-fi
-source /etc/openvpn/peizhi.cfg
-echo -e "\033[1;35m程序正在为您读取数据中...\033[0m"
-sleep 1
-clear
-echo
-if [ ! -f "/etc/openvpn/easy-rsa/keys/ca.crt" ]; then
-	echo -e "\033[31m程序为找到证书，请检查你的证书！\033[0m"
-	exit 0;
-fi
-if [ ! -f "/etc/openvpn/easy-rsa/ta.key" ]; then
-	echo -e "\033[31m程序为找到证书，请检查你的证书！\033[0m"
-	exit 0;
-fi
-echo -e "\033[1;32m>您的IP为：${IP}\033[0m"
-echo -e "\033[1;33m>数据库账号为：${root}\033[0m"
-echo -e "\033[1;33m>数据库密码为：${mima}\033[0m"
-echo
-echo -e -n "\033[1;34m>以上信息没有错误，请点击回车键继续,如错误请输入2 \033[0m"
-read peizhi
-if [[ "$peizhi" == "2" ]]
-then
-echo
-echo "请提供您本机服务器信息:"
-echo
-echo -n " 请输入本机数据库账号 【回车默认；root】："
-read root
-if [[ -z $root ]] 
-then 
-echo
-echo -e "\033[34m你输入的本机数据库账号为：root \033[0m" 
-root=root
-else 
-echo
-echo -e "\033[34m你输入的本机数据库账号为：$root \033[0m" 
-fi
-echo
-echo -n " 请输入本机数据库密码 【回车默认；root】："
-read mima
-if [[ -z $mima ]] 
-then 
-echo
-echo -e "\033[34m你输入的本机数据库密码为：root \033[0m" 
-mima=root
-else 
-echo
-echo -e "\033[34m你输入的本机数据库密码为：$mima \033[0m" 
-localhost=localhost
-fi
-fi
-clear
-echo -e "\033[1;35m开始为您备份原数据库！\033[0m"
-mkdir /root/backups/ >/dev/null 2>&1
-cd /root/backups/
-mysqldump -h${localhost} -u${root} -p${mima} ov >ov.sql
-echo
-if [ ! -f "/root/backups/ov.sql" ]; then
-	echo -e "\033[1;31m用户数据备份失败，是否还要继续执行脚本，是请点击回车，否请终止脚本运行！\033[0m"
-	read
-else
-	echo -e "\033[1;32m用户数据备份成功\033[0m"
-	mysql -h$localhost -u$root -p$mima ov -e "drop table line" >/dev/null 2>&1
-	mysql -h$localhost -u$root -p$mima ov -e "drop table qyun_article" >/dev/null 2>&1
-fi
-echo
-echo -e "\033[1;35m开始为您导入线路！\033[0m"
-cd /etc/openvpn/
-wget ${https}${hostfile}/linesql.zip >/dev/null 2>&1
-unzip linesql.zip >/dev/null 2>&1
-rm -rf linesql.zip >/dev/null 2>&1
-cacrt=`cat /etc/openvpn/easy-rsa/keys/ca.crt`
-takey=`cat /etc/openvpn/easy-rsa/ta.key`
-sed -i 's/【ip】/'${IP}'/g' /etc/openvpn/line.sql >/dev/null 2>&1
-mysql -h$localhost -u$root -p$mima ov < /etc/openvpn/line.sql
-mysql -h$localhost -u$root -p$mima ov -e "UPDATE line SET content = REPLACE( content,'【证书】','${cacrt}');" >/dev/null 2>&1
-mysql -h$localhost -u$root -p$mima ov -e "UPDATE line SET content = REPLACE( content,'【key】','${takey}');" >/dev/null 2>&1
-sed -i 's/【ip】/'$IP'/g' /etc/openvpn/qyun_article.sql >/dev/null 2>&1
-mysql -h$localhost -u$root -p$mima ov < /etc/openvpn/qyun_article.sql
-mysql -h$localhost -u$root -p$mima ov -e "UPDATE qyun_article SET content = REPLACE( content,'【证书】','${cacrt}');" >/dev/null 2>&1
-mysql -h$localhost -u$root -p$mima ov -e "UPDATE qyun_article SET content = REPLACE( content,'【key】','${takey}');" >/dev/null 2>&1
-rm -rf /etc/openvpn/line.sql >/dev/null 2>&1
-rm -rf /etc/openvpn/qyun_article.sql >/dev/null 2>&1
-echo
-echo -e "\033[1;35m线路导入成功！\033[0m"
-echo
-vpn
-exit 0;
-fi
-if [[ "$installslect" == "2" ]]
-then
-if [ ! -e "/home/wwwroot/default/user/app_api.php" ];then
-echo "对接失败，您的服务器还未搭建青云openvpn"
-exit 0;
-fi
-clear
-echo -e " 温馨提示：\033[35m对此操作未了解其意义的请勿继续操作\033[0m"
-echo -e " \033[35m管理对接需要在两台服务器执行以下对应选项\033[0m"
-echo
-echo " 请选择主机类型："
-echo 
-echo -e " 1 - \033[38m本机为主服务器\033[0m（开启本机管理系统）" 
-echo -e " 2 - \033[38m本机为次服务器\033[0m（接入到管理服务器）"
-echo
-echo -e " 3 - 退出"
-echo
-echo -n "输入选项: "
-read docked
-case $docked in
-[1]|[1-3]) ;;
-*) echo -e '\n ...选择错误，安装被终止';exit 0 ;;
-esac
-if [[ "$docked" == "1" ]]
-then
-source /etc/openvpn/peizhi.cfg
-echo -e "\033[1;35m程序正在为您读取数据中...\033[0m"
-sleep 1
-clear
-echo -e "\033[1;32m>您的IP为：${IP}\033[0m"
-echo -e "\033[1;33m>数据库账号为：${root}\033[0m"
-echo -e "\033[1;33m>数据库密码为：${mima}\033[0m"
-echo
-echo -e -n "\033[1;34m>以上信息没有错误，请点击回车键继续,如错误请输入2 \033[0m"
-read peizhi
-if [[ "$peizhi" == "2" ]]
-then
-echo
-echo "请提供您本机服务器信息:"
-echo
-echo -n " 请输入本机数据库账号 【回车默认；root】："
-read root
-if [[ -z $root ]] 
-then 
-echo
-echo -e "\033[34m你输入的本机数据库账号为：root \033[0m" 
-root=root
-else 
-echo
-echo -e "\033[34m你输入的本机数据库账号为：$root \033[0m" 
-fi
-echo
-echo -n " 请输入本机数据库密码 【回车默认；root】："
-read mima
-if [[ -z $mima ]] 
-then 
-echo
-echo -e "\033[34m你输入的本机数据库密码为：root \033[0m" 
-mima=root
-else 
-echo
-echo -e "\033[34m你输入的本机数据库密码为：$mima \033[0m" 
-fi
-fi
-echo
-localhost=localhost
-echo "开始配置"
-echo ">>>>>>>>>>"
-echo
-sleep 1
-echo -e " 正在开启主服务器远程数据库功能..."
-mysql -h$localhost -u$root -p$mima --default-character-set=utf8<<EOF
-GRANT ALL PRIVILEGES ON *.* TO '${mysqlroot}'@'%'IDENTIFIED BY '${mysqlmima}' WITH GRANT OPTION;
-flush privileges;
-EOF
-sleep 1
-iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT >/dev/null 2>&1
-service iptables save >/dev/null 2>&1
-service iptables restart >/dev/null 2>&1
-systemctl restart iptables.service >/dev/null 2>&1
-echo
-vpn >/dev/null 2>&1
-echo -e " 主服务器配置完成  [  \033[32mOK\033[0m  ]"
-echo -e " 请您在副机上执行对接命令！"
-echo
-exit 0;
-fi
-if [[ "$docked" == "2" ]]
-then
-echo "正在进入对接主机向导..."
-echo
-echo -n " 请输入主服务器IP(远程数据库域名或IP,不带http://)："
-read adminIP
-echo
-echo -e "\033[34m你输入主服务器端口IP：$adminIP \033[0m" 
-echo
-echo -n " 请输入管理(主)服务器端口 【回车默认；1234】："
-read adminPort
-if [[ -z $adminPort ]] 
-then 
-echo
-echo -e "\033[34m你输入的管理(主)服务器端口为：1234 \033[0m" 
-adminPort=1234
-else 
-echo
-echo -e "\033[34m你输入的管理(主)服务器端口为：$adminPort \033[0m" 
-fi
-echo
-echo -n " 请输入管理(主)服务器数据库账号 【回车默认；root】："
-read mysqlroot
-if [[ -z $mysqlroot ]] 
-then 
-echo
-echo -e "\033[34m你输入的管理(主)服务器数据库账号为：root \033[0m" 
-mysqlroot=root
-else 
-echo
-echo -e "\033[34m你输入的管理(主)服务器数据库账号为：$mysqlroot \033[0m" 
-fi
-echo
-echo -n " 请输入管理(主)服务器数据库密码 【回车默认；root】："
-read mysqlmima
-if [[ -z $mysqlmima ]] 
-then 
-echo
-echo -e "\033[34m你输入的管理(主)数据库密码为：root \033[0m" 
-mysqlmima=root
-else 
-echo
-echo -e "\033[34m你输入的管理(主)数据库密码为：$mysqlmima \033[0m" 
-fi
-if [ ! -e "/home/wwwroot/default/app_api/config.php" ];then
-appopen=no
-else
-appopen=yes
-echo
-echo -n " 请输入流量卫士Key 【回车默认；qyunren1009】："
-read adminKey
-if [[ -z $adminKey ]] 
-then 
-echo
-echo -e "\033[34m已写入流量卫士对接KEY：qyunren1009 \033[0m" 
-adminKey=qyunren1009
-else 
-echo
-echo -e "\033[34m已写入流量卫士对接KEY：$adminKey \033[0m" 
-fi
-fi
-echo
-rm -rf /etc/openvpn/peizhi.cfg
-rm -rf /home/wwwroot/default/app_api/licences.key
-echo "#设置更新周期,单位为秒(看服务器负载情况调节)
-shijian=30;
-#设置数据库存储流量单位,KB=1024,MB=1048576,GB=1073741824
-chu=1;
-#设置数据库存储流量单位,KB=1024,MB=1048576,GB=1073741824
-chuu=1;
-#设置自动备份时间
-butime=86400;
-#是否使用流量卫士
-appopen=$appopen;
-#流量卫士地址
-apphost=$adminIP:$adminPort;
-#流量卫士key
-appkey=$adminKey;
-#数据库地址
-localhost=$adminIP;
-#数据库账号
-root=$mysqlroot;
-#数据库密码
-mima=$mysqlmima;
-#数据库名称
-shujuku=ov;
-#用户名
-user=iuser;
-#用户表
-users=openvpn;
-#发送流量字段
-isent=isent;
-#接收流量字段
-irecv=irecv;
-#套餐流量字段
-maxll=maxll;
-" >/etc/openvpn/peizhi.cfg
-echo "$adminKey" >/home/wwwroot/default/app_api/licences.key
-chmod 777 /home/wwwroot/default/config.php
-rm -rf /home/wwwroot/default/config.php
-rm -rf /home/wwwroot/default/app_api/config.php
-rm -rf /home/wwwroot/default/app_api/top_api.php
-cd /home/wwwroot/default/
-wget http://yun.mkill.cn/api/config.php >/dev/null 2>&1
-cd /home/wwwroot/default/app_api/
-wget http://4gml.com.cn/qy/config.txt >/dev/null 2>&1
-rm -rf config.php >/dev/null 2>&1
-cp config.txt config.php >/dev/null 2>&1
-wget http://yun.mkill.cn/api/app_api/top_api.php >/dev/null 2>&1
-sed -i 's/localhost/'$adminIP'/g' /home/wwwroot/default/config.php >/dev/null 2>&1
-sed -i 's/mysqlroot/'$mysqlroot'/g' /home/wwwroot/default/config.php >/dev/null 2>&1
-sed -i 's/mysqlmima/'$mysqlmima'/g' /home/wwwroot/default/config.php >/dev/null 2>&1
-sed -i 's/localhost/'$adminIP'/g' /home/wwwroot/default/app_api/config.php >/dev/null 2>&1
-sed -i 's/mysqlroot/'$mysqlroot'/g' /home/wwwroot/default/app_api/config.php >/dev/null 2>&1
-sed -i 's/mysqlmima/'$mysqlmima'/g' /home/wwwroot/default/app_api/config.php >/dev/null 2>&1
-mv /home/wwwroot/default/app_api/top_api.php /home/wwwroot/default/app_api/${adminKey}.php >/dev/null 2>&1
-chmod 777 -R /home/wwwroot/default/ >/dev/null 2>&1
-sleep 1
-echo -e " 对接成功   [  \033[32mOK\033[0m  ]"
-echo -e " 请确认服务器 \033[32m $adminIP \033[0m 已开启管理功能"
-echo " 本服务器OpenVPN连接账号全权由 $adminIP 服务器管理"
-echo 
-exit 0;
-fi
-if [[ "$docked" == "3" ]]
-then
-exit 0;
-fi
-fi
-if [[ "$installslect" == "5" ]]
-then
-clear
-echo
-echo " 请选择主机类型："
-echo 
-echo -e " 1 - \033[31m备份服务器数据\033[0m" 
-echo -e " 2 - \033[31m导入服务器数据\033[0m"
-echo
-echo -n "输入选项: "
-read bfdr
-case $bfdr in
-[1]|[1-2]) ;;
-*) echo -e '\n ...选择错误，程序被终止';exit 0 ;;
-esac
-if [[ "$bfdr" == "1" ]]
-then
-clear
-echo
-echo -e "\033[31m备份需要提供您的数据库资料！请如实填写，如有错误讲无法正常备份数据库资料。\033[0m"
-echo -e "\033[31m如有填写错误请按住Ctrl + C终止脚本运行\033[0m"
-echo
-echo
-echo -n " 请您输入服务器的数据库账号 【回车默认；root】："
-read qyroot
-if [[ -z $qyroot ]] 
-then 
-echo
-echo -e "\033[34m您输入服务器的数据库账号为：root \033[0m" 
-qyroot=root
-else 
-echo
-echo -e "\033[34m您输入服务器的数据库账号为：$qyroot \033[0m" 
-fi
-echo
-echo -n " 请您输入服务器的数据库密码 【回车默认；root】："
-read qypass
-if [[ -z $qypass ]] 
-then 
-echo
-echo -e "\033[34m您输入服务器的数据库密码为：root \033[0m" 
-qypass=root
-else 
-echo
-echo -e "\033[34m您输入服务器的数据库密码为：$qypass \033[0m" 
-fi
-echo
-echo -e "\033[31m正在尝试备份数据库客户、卡密、代理、线路等资料...\033[0m"
-sleep 3
-mkdir -p /root/beifen/
-chmod -R 777 /root/beifen/
-mysqldump -u$qyroot -p$qypass ov openvpn >/root/beifen/openvpn.sql
-mysqldump -u$qyroot -p$qypass ov auth_kms >/root/beifen/auth_kms.sql
-mysqldump -u$qyroot -p$qypass ov auth_daili >/root/beifen/auth_daili.sql
-mysqldump -u$qyroot -p$qypass ov qyun_article >/root/beifen/qyun_article.sql
-mysqldump -u$qyroot -p$qypass ov line >/root/beifen/line.sql
-echo
-if [ ! -f "/root/beifen/openvpn.sql" ]; then
-	echo -e "  \033[31m用户数据备份失败\033[0m"
-else
-	echo -e "  \033[32m用户数据备份成功\033[0m"
-fi
-sleep 1
-echo
-if [ ! -f "/root/beifen/auth_kms.sql" ]; then
-	echo -e "  \033[31m卡密数据备份失败\033[0m"
-else
-	echo -e "  \033[32m卡密数据备份成功\033[0m"
-fi
-sleep 1
-echo
-if [ ! -f "/root/beifen/auth_daili.sql" ]; then
-	echo -e "  \033[31m代理数据备份失败\033[0m"
-else
-	echo -e "  \033[32m代理数据备份成功\033[0m"
-fi
-sleep 1
-echo
-if [ ! -f "/root/beifen/qyun_article.sql" ]; then
-	echo -e "  \033[31m青云自带APP线路备份失败\033[0m"
-else
-	echo -e "  \033[32m青云自带APP线路备份成功\033[0m"
-fi
-sleep 1
-echo
-if [ ! -f "/root/beifen/line.sql" ]; then
-	echo -e "  \033[31m流量卫士APP线路备份失败\033[0m"
-else
-	echo -e "  \033[32m流量卫士APP线路备份成功\033[0m"
-fi
-sleep 1
-echo
-cd /root/
-tar zcvf beifen.tar.gz ./beifen/ >/dev/null 2>&1
-rm -rf /root/beifen/
-curl --upload-file ./beifen.tar.gz ${http}${upload}/beifen.tar.gz >/dev/null 2>&1 >url
-bunum=`cat url`
-bunum=${bunum#*transfer.sh/}
-bunum=${bunum%/*}
-rm -rf url >/dev/null 2>&1
-echo
-echo
-sleep 3
-if [ ! -f "/root/beifen.tar.gz" ]; then
-echo -e "\033[31m备份失败，请重新尝试！\033[0m"
-else
-if [[ "$bunum" != "" ]]; then
-echo -e "您服务器的备份码为:\033[31m ${bunum} \033[0m ,请牢记您的备份码!"
-fi
-echo -e "\033[31m您服务器备份的数据在服务器root目录（文件名为：beifen.tar.gz）\033[0m"
-echo
-fi
-exit 0;
-fi
-fi
-if [[ "$bfdr" == "2" ]]
-then
-clear
-echo
-echo -e "\033[31m请输入你的备份码或将备份(beifei.tar.gz)文件传至root目录！\033[0m"
-echo
-echo -n -e "\033[31m请填写您的备份码或直接上传备份文件到root目录然后直接按回车键\033[0m :"
-read bunum
-if [[ "$bunum" != "" ]]
-then
-cd /root/
-wget ${http}${upload}/${bunum}/beifen.tar.gz >/dev/null 2>&1
-if [ ! -f "/root/beifen.tar.gz" ]; then
-	echo -e "\033[31m您的备份码错误，请检测后重新执行脚本恢复！\033[0m"
-	exit 0;
-fi
-else
-echo
-if [ ! -f "/root/beifen.tar.gz" ]; then
-	echo -e "\033[31m未检查到你上次的备份文件，无法使用导入功能,请将beifen.tar.gz上传到服务器root目录\033[0m"
-	exit 0;
-fi
-fi
-clear
-echo
-echo -e "\033[31m导入需要提供您的数据库资料！如有填写错误请按住Ctrl + C终止脚本运行\033[0m"
-echo
-echo -n " 请您输入服务器的数据库账号 【回车默认；root】："
-read qyroot
-if [[ -z $qyroot ]] 
-then 
-echo
-echo -e "\033[34m您输入服务器的数据库账号为：root \033[0m" 
-qyroot=root
-else 
-echo
-echo -e "\033[34m您输入服务器的数据库账号为：$qyroot \033[0m" 
-fi
-echo
-echo -n " 请您输入服务器的数据库密码 【回车默认；root】："
-read qypass
-if [[ -z $qypass ]] 
-then 
-echo
-echo -e "\033[34m您输入服务器的数据库密码为：root \033[0m" 
-qypass=root
-else 
-echo
-echo -e "\033[34m您输入服务器的数据库密码为：$qypass \033[0m" 
-fi
-echo
-echo -e "\033[36m正在整理服务器文件，请稍等！\033[0m"
-cd /root/
-tar zxf beifen.tar.gz
-sleep 1
-echo
-echo -e "\033[31m整理完毕，开始恢复服务器数据！\033[0m"
-if [ -f "/root/beifen/openvpn.sql" ]; then
-	 mysql -u$qyroot -p$qypass -hlocalhost ov < /root/beifen/openvpn.sql
-fi
-if [ -f "/root/beifen/auth_kms.sql" ]; then
-	 mysql -u$qyroot -p$qypass -hlocalhost ov < /root/beifen/auth_kms.sql
-fi
-if [ -f "/root/beifen/auth_daili.sql" ]; then
-	 mysql -u$qyroot -p$qypass -hlocalhost ov < /root/beifen/auth_daili.sql
-fi
-if [ -f "/root/beifen/qyun_article.sql" ]; then
-	 mysql -u$qyroot -p$qypass -hlocalhost ov < /root/beifen/qyun_article.sql
-fi
-if [ -f "/root/beifen/line.sql" ]; then
-	 mysql -u$qyroot -p$qypass -hlocalhost ov < /root/beifen/line.sql
-fi
-echo
-echo -e "\033[31m数据导入成功，正在为您导入服务器证书\033[0m"
-rm -rf /root/beifen/
-rm -rf /root/beifen.tar.gz
-echo -e "\033[31m数据已经全部导入成功！！！\033[0m"
-vpn
-exit 0;
-fi
-if [[ "$installslect" == "3" ]]
-then
-clear
-if [ ! -e "/home/wwwroot/default/user/app_api.php" ];then
-echo
-echo "对接失败，您的服务器还未搭建最新版青云"
-exit 0;
-fi
-echo "生成程序正在加载中，请稍后......"
-sleep 3
-clear
-echo -e "\033[31m请输入您流控端口号【默认为1234】 \033[0m"
-echo
-echo -n -e "请输入Web流控端口号 \033[33m【温馨提示:正确填写您流控的端口号】\033[0m :"
-read port
-if [[ -z $port ]]
-then
-port=1234
-fi
-echo
-echo -e "\033[34m您WEB流控端口号为：$port\033[0m"
-echo
-sleep 3
-clear
-echo -e "\033[31m即将开始设置云端APP的信息\033[0m"
-echo -e "\033[31m文字请先在外部输入后复制粘贴\033[0m"
-echo
-sleep 3
-echo
-echo -n -e "设置APP名称【回车默认；青云云流量】："
-read appname 
-if [[ -z $appname ]] 
-then 
-echo
-echo -e "\033[34m已设置App名称：青云云流量\033[0m" 
-appname=青云云流量 
-else 
-echo
-echo -e "\033[34m已设置App名称：$appname \033[0m"
-fi
-echo 
-echo -e "\033[31m自定义设置App客服QQ【回车默认；100340768】\033[0m"
-echo 
-echo -n -e "App客服QQ：" 
-read appqq
-if [[ -z $appqq ]] 
-then 
-echo
-echo -e "\033[34m已设置App客服QQ：100340768 \033[0m" 
-appqq=100340768
-else 
-echo
-echo -e "\033[34m已设置App客服QQ:$appqq \033[0m"
-fi 
-echo
-echo -e "\033[31m自定义设置APP对接KEY(回车默认随机key)\033[0m"
-echo
-echo  -n -e "APP对接KEY：【温馨提示:KEY修改后请到后台云端同步更新KEY】" 
-read appkey
-if [[ -z $appkey ]] 
-then 
-appkey=QYUN$RANDOM$RANDOM
-fi
-echo
-echo -e "\033[34m已设置APP对接KEY：$appkey \033[0m" 
-echo
-sleep 3
-echo -e "\033[35m正在为您生成美化版Android应用...\033[0m"
-rm -rf /home/android
-rm -rf /home/wwwroot/default/qyun.apk
-if [ ! -e "/usr/bin/java" ]; #青云
-then
-yum install -y java >/dev/null 2>&1
-fi
-cd /home
-mkdir android
-chmod 777 -R /home/android
+mkdir /home/android 
+chmod 0777 -R /home/android 
 cd /home/android
-wget ${https}${hostfile}/apktool.jar >/dev/null 2>&1
-wget ${https}${hostfile}/qyun.apk >/dev/null 2>&1
-if [ ! -f "/home/android/apktool.jar" ]; then
-	wget ${https}${hostfile}/apktool.jar >/dev/null 2>&1
+# 反编译
+echo && echo -e "正在反编译APP..."
+wget -q ${web}$Host/apktool.jar 
+wget -q ${web}$Host/Kyun.apk 
+java -jar apktool.jar d Kyun.apk >/dev/null 2>&1
+
+sed -i 's/'wap.kuaiyum.com:8888'/'${IP}:${webdk}'/g' "/home/android/Kyun/smali/net/openvpn/openvpn/base.smali"
+sed -i 's/'wap.kuaiyum.com:8888'/'${IP}:${webdk}'/g' "/home/android/Kyun/smali/net/openvpn/openvpn/OpenVPNClient.smali" 
+sed -i 's/'wap.kuaiyum.com:8888'/'${IP}:${webdk}'/g' "/home/android/Kyun/smali/net/openvpn/openvpn/OpenVPNClient\$10.smali" 
+sed -i 's/'wap.kuaiyum.com:8888'/'${IP}:${webdk}'/g' "/home/android/Kyun/smali/net/openvpn/openvpn/OpenVPNClient\$11.smali" 
+sed -i 's/'wap.kuaiyum.com:8888'/'${IP}:${webdk}'/g' "/home/android/Kyun/smali/net/openvpn/openvpn/OpenVPNClient\$13.smali" 
+sed -i 's/'wap.kuaiyum.com:8888'/'${IP}:${webdk}'/g' "/home/android/Kyun/smali/net/openvpn/openvpn/Main2Activity\$MyListener\$1.smali" 
+sed -i 's/'wap.kuaiyum.com:8888'/'${IP}:${webdk}'/g' '/home/android/Kyun/smali/net/openvpn/openvpn/Main2Activity$MyListener.smali' 
+sed -i 's/'wap.kuaiyum.com:8888'/'${IP}:${webdk}'/g' '/home/android/Kyun/smali/net/openvpn/openvpn/MainActivity.smali' 
+sed -i 's/'wap.kuaiyum.com:8888'/'${IP}:${webdk}'/g' '/home/android/Kyun/smali/net/openvpn/openvpn/update$myClick$1.smali'
+sed -i 's/'wap.kuaiyum.com:8888'/'${IP}:${webdk}'/g' '/home/android/Kyun/smali/net/openvpn/openvpn/AutoScrollTextView.smali' 
+sed -i 's/快云流量/'$appname'/g' "/home/android/Kyun/res/values/strings.xml"
+if [[ $img == 'yes' ]];then
+  # 图标
+  rm -rf /home/android/Kyun/res/drawable-hdpi-v4/icon.png
+  rm -rf /home/android/Kyun/res/drawable-mdpi-v4/icon.png
+  rm -rf /home/android/Kyun/res/drawable-xhdpi-v4/icon.png
+  wget -q -O /home/android/Kyun/res/drawable-xhdpi-v4/icon.png $urlA
+  cp /home/android/Kyun/res/drawable-xhdpi-v4/icon.png /home/android/Kyun/res/drawable-mdpi-v4/icon.png
+  cp /home/android/Kyun/res/drawable-xhdpi-v4/icon.png /home/android/Kyun/res/drawable-hdpi-v4/icon.png
+
+  # 启动图
+  rm -rf /home/android/Kyun/res/drawable/splash.png
+  wget -q -O /home/android/Kyun/res/drawable/splash.png $urlB
 fi
-if [ ! -f "/home/android/qyun.apk" ]; then
-	wget ${https}${hostfile}/qyun.apk >/dev/null 2>&1
-fi
-java -jar apktool.jar d qyun.apk
-sed -i 's/www.qyunl.com/'${IP}:${port}'/g' /home/android/qyun/smali/net/openvpn/openvpn/AutoScrollTextView.smali >/dev/null 2>&1
-sed -i 's/www.qyunl.com/'${IP}:${port}'/g' /home/android/qyun/smali/net/openvpn/openvpn/ChongzhiActivity.smali >/dev/null 2>&1
-sed -i 's/www.qyunl.com/'${IP}:${port}'/g' '/home/android/qyun/smali/net/openvpn/openvpn/DoActivity$3.smali' >/dev/null 2>&1
-sed -i 's/www.qyunl.com/'${IP}:${port}'/g' '/home/android/qyun/smali/com/mayor/prg/mst$2.smali' >/dev/null 2>&1
-sed -i 's/www.qyunl.com/'${IP}:${port}'/g' /home/android/qyun/smali/net/openvpn/openvpn/MainActivity.smali >/dev/null 2>&1
-sed -i 's/www.qyunl.com/'${IP}:${port}'/g' /home/android/qyun/smali/net/openvpn/openvpn/MainTabActivity.smali >/dev/null 2>&1
-sed -i 's/www.qyunl.com/'${IP}:${port}'/g' /home/android/qyun/smali/net/openvpn/openvpn/OpenVPNClient.smali >/dev/null 2>&1
-sed -i 's/qyunrdkey/'$appkey'/g' '/home/android/qyun/smali/com/mayor/prg/mst$2.smali' >/dev/null 2>&1
-sed -i 's/qyunrdkey/'$appkey'/g' /home/android/qyun/smali/net/openvpn/openvpn/ChongzhiActivity.smali >/dev/null 2>&1
-sed -i 's/qyunrdkey/'$appkey'/g' '/home/android/qyun/smali/net/openvpn/openvpn/DoActivity$3.smali' >/dev/null 2>&1
-sed -i 's/qyunrdkey/'$appkey'/g' /home/android/qyun/smali/net/openvpn/openvpn/MainActivity.smali >/dev/null 2>&1
-sed -i 's/qyunrdkey/'$appkey'/g' /home/android/qyun/smali/net/openvpn/openvpn/MainTabActivity.smali >/dev/null 2>&1
-sed -i 's/qyunrdkey/'$appkey'/g' /home/android/qyun/smali/net/openvpn/openvpn/OpenVPNClient.smali >/dev/null 2>&1
-sed -i 's/青云云流量/'$appname'/g' /home/android/qyun/res/values/strings.xml >/dev/null 2>&1
-sed -i 's/100340768/'$appqq'/g' /home/android/qyun/res/values/strings.xml >/dev/null 2>&1
-sudo chmod +x /home/android/apktool.jar
-java -jar apktool.jar b qyun >/dev/null 2>&1
-cd /home/android/qyun/dist
-wget ${https}${hostfile}/signer.tar.gz >/dev/null 2>&1
-if [ ! -f "/home/android/qyun/dist/signer.tar.gz" ]; then
-	wget ${https}${hostfile}/signer.tar.gz >/dev/null 2>&1
-fi
+
+# 打包
+echo && echo -e "正在签名打包APP..."
+chmod +x /home/android/apktool.jar
+java -jar apktool.jar b Kyun >/dev/null 2>&1
+cd /home/android/Kyun/dist
+wget -q ${web}$Host/signer.tar.gz 
 tar zxf signer.tar.gz
-java -jar signapk.jar testkey.x509.pem testkey.pk8 qyun.apk qyunml.apk
-\cp -rf /home/android/qyun/dist/qyunml.apk /home/wwwroot/default/qyun.apk
-echo
-echo "正在上传文件中..."
-echo "温馨提示："
-echo "上传需要几分钟具体时间看你服务器配置"
-echo "再此期间请耐心等待！"
-clear
-rm -rf /home/android
-rm -rf /root/ShakaApktool
-echo -e "\033[33m欢迎您使用青云一键对接APP脚本\033[0m"
-if [ ! -e "/home/wwwroot/default/qyun.apk" ];then
-echo -e "\033[31m检测到您使用的APP名字为乱码，所以APP没有生成成功。\033[0m"
-else
-echo -e "\033[36m
----------------------------------------------------------
-
-APP下载地址：http://${IP}:${port}/qyun.apk
-
----------------------------------------------------------
-
-
----------------------------------------------------------
-您的APP名字为：${appname}
-您的APP客服QQ：${appqq}
-
-您设置的APP对接KEY为：${appkey}
-
-注意：请检查您APP的KEY是否与后台云端管理KEY一致
-      如不一致请修改成APP对接key
-	  
-APP加固地址：http://jaq.alibaba.com/
----------------------------------------------------------
-\033[0m"
-fi
-exit 0;
-fi
-if [[ "$installslect" == "4" ]]
-then
-if [ ! -e "/home/wwwroot/default/user/app_api.php" ];then
-echo
-echo "对接失败，您的服务器还未搭建青云openvpn"
-echo
-exit 0;
-fi
-clear
-echo
-echo -e "\033[32m欢迎您选择使用青云，青云一直希望能够给您更极致的速度！\033[0m"
-echo
-echo -e "\033[32m 1 - 安装锐速加速器（国内服务器慎用）\033[0m"
-echo
-echo -e "\033[32m 2 - 卸载锐速加速器\033[0m"
-echo
-echo -e "\033[32m 3 - 服务器测速\033[0m"
-echo
-echo -n "请输入选项: " 
-read mode
-if [[ "$mode" == "1" ]]
-then
-wget -N --no-check-certificate https://raw.githubusercontent.com/91yun/serverspeeder/master/serverspeeder-all.sh >/dev/null 2>&1
-bash serverspeeder-all.sh
-rm -r serverspeeder-all.sh
-rm -r 91yunserverspeeder.tar.gz
-exit 0;
-fi
-if [[ "$mode" == "2" ]]
-then   
-chattr -i /serverspeeder/etc/apx* && /serverspeeder/bin/serverSpeeder.sh uninstall -f >/dev/null 2>&1
-if [ $? -eq 0 ];then
-clear
-echo -e "卸载成功，感谢您再次使用锐速加速功能。";
-else
-clear
-echo -e "卸载失败，锐速加速器卸载失败了!";
-exit
-fi
-fi
-if [[ $mode == "3" ]]     
-then
-echo
-wget -O speedtest-cli http://yun.mkill.cn/speedtest_cli.py >/dev/null 2>&1
-chmod +x speedtest-cli
-./speedtest-cli
-rm speedtest-cli
-exit 0;
-fi
-fi
-		if [[ "$installslect" == "x" ]]
-		then
-			clear
-			echo
-			echo "正在移除系统OpenVPN服务/配置文件..."
-			echo
-			echo "正在停止服务..."
-			systemctl stop openvpn@server.service >/dev/null 2>&1
-			systemctl stop squid.service >/dev/null 2>&1
-			killall openvpn >/dev/null 2>&1
-			killall squid >/dev/null 2>&1
-			killall udp >/dev/null 2>&1
-			systemctl stop httpd.service >/dev/null 2>&1
-			systemctl stop mariadb.service >/dev/null 2>&1
-			systemctl stop mysqld.service >/dev/null 2>&1
-			/etc/init.d/mysqld stop >/dev/null 2>&1
-			sleep 2
-			echo "正在卸载程序..."
-			yum remove -y openvpn squid >/dev/null 2>&1
-			yum remove -y httpd >/dev/null 2>&1
-			yum remove -y nginx >/dev/null 2>&1
-			yum remove -y mariadb mariadb-server >/dev/null 2>&1
-			yum remove -y mysql mysql-server>/dev/null 2>&1
-			yum remove -y php-fpm php-cli php-gd php-mbstring php-mcrypt php-mysqlnd php-opcache php-pdo php-devel php-xml >/dev/null 2>&1	
-			echo "正在清理残留文件..."
-			rm -rf /etc/squid /etc/openvpn /bin/dup /home/* /lib/systemd/system/vpn.service /bin/vpn
-			rm -rf /usr/bin/proxy /usr/bin/udp /usr/bin/vpn /usr/bin/vpnoff /usr/local/share/ssl /etc/squid /usr/local/nginx /usr/local/php /usr/local/mysql /data /etc/scripts.conf /lib/systemd/system/vpn.service
-			rm -rf /etc/init.d/nginx /etc/init.d/php-fpm /etc/init.d/mysql /etc/python/cert-python.conf /etc/openvpn/connect.sh /etc/openvpn/disconnect.sh /etc/openvpn/login.sh
-			rm -rf /etc/openvpn/*
-			rm -rf /etc/openvpn/
-			rm -rf /root/*
-			rm -rf /home/*
-			sleep 2 
-			rm -rf /var/lib/mysql
-			rm -rf /var/lib/mysql/
-			rm -rf /usr/lib64/mysql
-			rm -rf /etc/my.cnf
-			rm -rf /var/log/mysql/
-			rm -rf
-			rm -rf /etc/openvpn/*
-			echo "再见了，亲，欢迎您在次使用！"
-			exit 0;
-			else
-			clear
-			echo
-			echo -e "\033[31m 请设置免流端口：（青云自带440与3389端口请勿使用这两个端口）\033[0m"
-			echo 
-			echo -n -e "输入VPN端口（默认443）\033[33m【温馨提示:回车默认443】\033[0m:" 
-			read vpnport 
-			if [[ -z $vpnport ]] 
-			then 
-			 	echo -e "\033[34m已设置VPN端口：443\033[0m"
- 			 	vpnport=443 
- 			 	else
- 				echo -e "\033[34m已设置VPN端口：$vpnport\033[0m"
-				fi
- 			 	echo
- 			 	echo -n -e "输入HTTP转接端口（默认8080）\033[33m【温馨提示：回车默认为8080】\033[0m:"
- 			 	read mpport
- 			 	if [[ -z $mpport ]] 
- 			 	then 
- 			 		echo -e  "\033[34m已设置HTTP转接端口： 8080\033[0m" 
- 			 		mpport=8080 
- 			 		else 
- 			 		echo -e  "\033[34m已设置HTTP转接端口：$mpport\033[0m" 
- 			 		fi 
- 			 		echo 
- 			 		echo -n -e "输入常规代理端口（默认80）\033[33m【温馨提示:建议保留80，已经防扫】\033[0m:" 
- 			 		read sqport 
- 			 	if [[ -z $sqport ]] 
- 			 	then 
- 			 		echo -e "\033[34m已设置常规代理端口：80\033[0m"
- 			 		sqport=80
- 			 		else 
- 			 		echo -e "\033[34m已设置常规代理端口：$sqport\033[0m"
- 			 		fi 
- 			 		echo
- 			 		echo -e "\033[31m请设置Web流控端口号【默认为1234】  \033[0m"
- 			 		echo
- 			 		echo -n -e "请输入Web流控端口号 \033[33m【温馨提示:建议使用默认端口】\033[0m :"
- 			 		read port
- 			 	if [[ -z $port ]]
- 			 	then
- 			 		port=1234
- 			 		fi
- 			 		echo
- 			 		echo -e "\033[34m已设置WEB流控端口号为：$port\033[0m"
- 			 		echo
- 			 		echo -e "\033[31m请设置您的数据库密码(回车默认随机) \033[0m"
- 			 		echo -n -e "请输入密码 \033[33m【温馨提示:建议设置复杂密码】\033[0m："
- 			 		read sqlpass
- 			 	if [[ -z $sqlpass ]]
- 			 	then
- 			 		sqlpass=QY$RANDOM$RANDOM
- 			 		fi
- 			 		echo -e "\033[34m已设置数据库密码完为：$sqlpass \033[0m"
- 			 		echo
- 			 		echo -e "\033[34m请设置WEB面板管理员账号(回车默认随机) \033[0m"
- 			 		echo -n -e "请输入WEB面板管理员账号 \033[33m【温馨提示:建议设置复杂密码】\033[0m :"
- 			 		read id
- 			 	if [[ -z $id ]]
- 			 	then
- 			 		id=$RANDOM$RANDOM
- 			 		fi
- 			 		echo -e "\033[34m已设置后台管理员用户名为：$id\033[0m"
- 			 		echo
- 			 		echo -e "\033[34m请设置WEB面板管理员密码(回车默认随机)  \033[0m"
- 			 		echo -n -e "请输入WEB面板管理员密码 \033[33m【温馨提示:建议设置复杂密码】\033[0m :"
- 			 		read ml
- 			 	if [[ -z $ml ]]
- 			 	then
- 			 		ml=QY$RANDOM$RANDOM
- 			 		fi
- 			 		echo -e "\033[34m已设置后台管理员密码为：$ml\033[0m"
- 			 		echo
- 			 		echo -e "\033[31m请设置监控频率周期(回车默认1秒) \033[0m"
- 			 		echo
- 			 		echo -n -e "请输入数字(单位/秒) \033[33m【温馨提示:建议默认1秒】\033[0m :"
- 			 		read jiankongs
- 			 	if [[ -z $jiankongs ]]
- 			 	then
- 			 		jiankongs=1
- 			 		fi
- 			 		echo -e "\033[34m已设置监控秒数为：$jiankongs\033[0m"
-					echo
- 			 		echo -e "\033[31m请设置自动备份频率周期(回车默认86400秒) \033[0m"
- 			 		echo
- 			 		echo -n -e "请输入数字(单位/秒) \033[33m【温馨提示:建议默认86400秒】\033[0m :"
- 			 		read butime
- 			 	if [[ -z $butime ]]
- 			 	then
- 			 		butime=86400
- 			 		fi
- 			 		echo -e "\033[34m已设置自动备份秒数为：$butime\033[0m"
- 			 		echo 
- 			 		echo 
- 			 		clear
- 			 		echo -e "\033[31m即将开始设置云端APP的信息\033[0m"
- 			 		echo -e "\033[31m文字请先在外部输入后复制粘贴\033[0m"
- 			 		echo
- 			 		sleep 1
- 			 		echo
- 			 		echo -n -e "设置APP名称【回车默认；青云云流量】："
- 			 		read appname 
- 			 	if [[ -z $appname ]] 
- 			 	then
-				appname=青云云流量 
-				fi
- 			 		echo
- 			 		echo -e "\033[34m已设置App名称：$appname \033[0m"
- 			 		echo 
- 			 		echo -e "\033[31m自定义设置App客服QQ【回车默认；100340768】\033[0m"
- 			 		echo 
- 			 		echo -n -e "App客服QQ：" 
- 			 		read appqq
- 			 	if [[ -z $appqq ]] 
- 			 	then 
- 			 		echo
- 			 		appqq=100340768
-                fi
- 			 		echo
- 			 		echo -e "\033[34m已设置App客服QQ:$appqq \033[0m"
- 			 		echo
- 			 		echo -e "\033[31m自定义设置APP对接KEY(回车默认随机)\033[0m"
- 			 		echo
- 			 		echo  -n -e "APP对接KEY：【温馨提示:KEY可以自行输入】" 
- 			 		read appkey
- 			 	if [[ -z $appkey ]] 
- 			 	then
-				appkey=QYUN$RANDOM$RANDOM
-				 fi
- 			 		echo
- 			 		echo -e "\033[34m已设置APP对接KEY：$appkey \033[0m" 
-				echo
-				echo -n " 你是否需要安装流量卫士5.1？y=安装 n=不安装（y/n）:"
-	            read llwsinstall
-	            case $llwsinstall in
-	 	        [y]|[n]) ;;
-		         *) echo -e '\n 输入错误，默认安装流量卫士。';llwsinstall=1; ;;
-	            esac
-	            if [[ $llwsinstall == "y" ]];then
-					llwsinstall=1;
-	            fi
-	            if [[ $llwsinstall == "n" ]];then
-                    llwsinstall=0;
-	            fi
-			    if [[ "$llwsinstall" == "1" ]];then
-                    clear
- 			 		echo -e "\033[31m即将开始设置流量卫士APP的信息\033[0m"
- 			 		echo -e "\033[31m文字请先在外部输入后复制粘贴\033[0m"
- 			 		echo
- 			 		echo
- 			 		echo -e "\033[34m请设置流量卫士面板管理员账号(回车默认随机)  \033[0m"
- 			 		echo -n -e "请输入流量卫士面板管理员账号 \033[33m【温馨提示:建议修改！】\033[0m :"
- 			 		read llwsid
- 			 	if [[ -z $llwsid ]]
- 			 	then
- 			 	llwsid=$RANDOM$RANDOM
- 			 	fi
- 			 		echo -e "\033[34m已设置流量卫士面板管理员账号为：$llwsid \033[0m"
- 			 		echo
-					echo -e "\033[34m请设置流量卫士面板管理员密码(回车默认随机)  \033[0m"
- 			 		echo -n -e "请输入流量卫士面板管理员密码 \033[33m【温馨提示:建议修改！】\033[0m :"
- 			 		read llwsmm
- 			 	if [[ -z $llwsmm ]]
- 			 	then
- 			 	llwsmm=QY$RANDOM$RANDOM
- 			 	fi
- 			 		echo -e "\033[34m已设置流量卫士面板管理员密码为：$llwsmm \033[0m"
- 			 		echo
- 			 		echo -n -e "设置流量卫士APP名称【回车默认；青云云流量】："
- 			 		read llwsname
- 			 	if [[ -z $llwsname  ]] 
- 			 	then 
-                llwsname=青云云流量
-                fi
- 			 		echo
- 			 		echo -e "\033[34m已设置流量卫士App名称：$llwsname  \033[0m"
- 			 	echo
- 			 	echo -e "\033[31m自定义设置流量卫士APP对接KEY(回车默认随机)\033[0m"
- 			 	echo
- 			 	echo  -n -e "APP对接KEY：【温馨提示:KEY可以随便输入】" 
- 			 	read llwskey
- 			 	if [[ -z $llwskey ]] 
- 			 	then 
-                llwskey=QYUN$RANDOM$RANDOM
-				fi
- 			 		echo
- 			 		echo -e "\033[34m已设置流量卫士APP对接KEY：$llwskey \033[0m" 
-					llwsmd5=`echo -n $llwskey|md5sum`
-				fi
-					
-echo
-echo 
-echo -e "\033[35m开始整理安装环境...\033[0m"
-echo -e "\033[35m可能需要1分钟左右...\033[0m"
-setenforce 0 >/dev/null 2>&1
-sestatus=`/usr/sbin/sestatus -v` >/dev/null 2>&1
-if [[ $sestatus =~ "enforcing" ]]; then
-echo -e "\033[34m 临时关闭Selinux失败,已为您修改配置,重启后生效 \033[0m "
-sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config >/dev/null 2>&1
-echo
-fi
-
-echo
-echo -e "\033[35m开始整理残留环境...\033[0m"
-systemctl stop openvpn@server.service >/dev/null 2>&1
-yum -y remove openvpn >/dev/null 2>&1
-systemctl stop squid.service >/dev/null 2>&1
-yum -y remove squid >/dev/null 2>&1
-killall udp >/dev/null 2>&1
-rm -rf /etc/openvpn/*
-rm -rf /root/*
+java -jar signapk.jar testkey.x509.pem testkey.pk8 Kyun.apk Kyunws.apk >/dev/null 2>&1
+cp -rf /home/android/Kyun/dist/Kyunws.apk /Data/wwwroot/Kyun/user/app/app.apk
 rm -rf /home/*
-sleep 2 
-systemctl stop httpd.service >/dev/null 2>&1
-systemctl stop mariadb.service >/dev/null 2>&1
-systemctl stop mysqld.service >/dev/null 2>&1
-/etc/init.d/mysqld stop >/dev/null 2>&1
-yum remove -y httpd >/dev/null 2>&1
-yum remove -y mariadb mariadb-server >/dev/null 2>&1
-yum remove -y mysql mysql-server >/dev/null 2>&1
-yum remove -y nginx >/dev/null 2>&1
-rm -rf /var/lib/mysql
-rm -rf /var/lib/mysql/
-rm -rf /usr/lib64/mysql
-rm -rf /etc/my.cnf
-rm -rf /var/log/mysql/
-rm -rf
-yum remove -y php-fpm php-cli php-gd php-mbstring php-mcrypt php-mysqlnd php-opcache php-pdo php-devel php-xml >/dev/null 2>&1
-sleep 2
-echo -e "\033[36m整理完毕\033[0m"
-echo
-	
+return 1
+}
+
+function KyunClear() {
 clear
-echo -e "\033[35m系统正在检查并更新软件，请耐心等待...\033[0m"
-sleep 3
-mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
-wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
-rpm -ivh http://mirrors.aliyun.com/epel/epel-release-latest-7.noarch.rpm
-rpm -Uvh http://rpms.remirepo.net/enterprise/remi-release-7.rpm 
-fwqtype=`curl -s  http://ip138.com/ips138.asp?ip=${IP}\&action=2 | iconv -f gb2312 -t utf-8|grep '<ul class="ul1"><li>' |awk -F'[><]+' '{  
-print $5}'`
-if [[ $fwqtype =~ "阿里云" ]] || [[ $fwqtype =~ "腾讯云" ]] || [[ $fwqtype =~ "小鸟云" ]]; then
-yum install -y unzip curl tar expect zip iptables iptables-services 
-yum install -y gcc java 
-else
-echo -e "\033[35m检测当前机器非阿里云/腾讯云/小鸟云,启用高防搭建模式...\033[0m"]
-yum clean all
-yum makecache
-yum update -y
-yum install -y unzip curl tar expect zip iptables iptables-services java
-yum install -y gcc
-#yum install -y unzip curl tar expect zip iptables iptables-services
-#yum install -y gcc java
-fi
-echo -e "\033[36m更新完成\033[0m"
-sleep 1
-
-
+echo -e "你需要自定义一些信息 [密码请尽量复杂]"
+# 管理员账号
 echo
-echo -e "\033[35m正在配置网络环境...\033[0m"
-sleep 1
+echo -n -e "请输入管理员账号 [默认：admin ]"
+read adminuser
+if [ -z $adminuser ]
+then
+	adminuser=admin
+	echo -e "\033[1;34m管理员账号已设置为：\033[32m $adminuser \033[0m" ;
+else
+	echo -e "\033[1;34m管理员账号已设置为：\033[32m $adminuser \033[0m"
+fi
+
+# 管理员密码
+echo
+echo -n -e "请输入管理员密码 [默认：admin ]"
+read adminpass
+if [ -z $adminpass ]
+then
+	adminpass=admin
+	echo -e "\033[1;34m管理员密码已设置为：\033[32m $adminpass \033[0m" ;
+else
+	echo -e "\033[1;34m管理员密码已设置为：\033[32m $adminpass \033[0m"
+fi
+
+# 本地二级密码
+echo
+echo -n -e "请输入本地二级密码 [默认：admin ]"
+read admintwopass
+if [ -z $admintwopass ]
+then
+	admintwopass=admin
+	echo -e "\033[1;34m本地二级密码已设置为：\033[32m $admintwopass \033[0m" ;
+else
+	echo -e "\033[1;34m本地二级密码已设置为：\033[32m $admintwopass \033[0m"
+fi
+
+# 数据库密码
+echo
+echo -n -e "请输入数据库密码 [默认：kuaiyum ]"
+read sqlpass
+if [ -z $sqlpass ]
+then
+	sqlpass=kuaiyum
+	echo -e "\033[1;34m数据库密码已设置为：\033[32m $sqlpass \033[0m" ;
+else
+	echo -e "\033[1;34m数据库密码已设置为：\033[32m $sqlpass \033[0m"
+fi
+
+# WEB端口
+echo
+echo -n -e "请输入后台端口 [默认：8888 ]"
+read webdk
+if [ -z $webdk ]
+then
+	webdk=8888
+	echo -e "\033[1;34m后台WEB端口已设置为：\033[32m $webdk \033[0m" ;
+else
+	echo -e "\033[1;34m后台WEB端口已设置为：\033[32m $webdk \033[0m"
+fi
+
+# 管理后台名称
+echo
+echo -n -e "请输入流量平台名称 [默认:快云免流 ]"
+read adminname
+if [ -z $adminname ]
+then
+	adminname=快云免流
+	echo -e "\033[1;34m流量平台名称已设置为：\033[32m $adminname \033[0m" ;
+else
+	echo -e "\033[1;34m流量平台名称已设置为：\033[32m $adminname \033[0m"
+fi
+
+# APP软件名称
+echo
+echo -n -e "请输入云端软件名称 [默认:快云流量 ]"
+read appname
+if [ -z $appname ]
+then
+	appname=快云流量
+	echo -e "\033[1;34m云端软件名称已设置为：\033[32m $appname \033[0m" ;
+else
+	echo -e "\033[1;34m云端软件名称已设置为：\033[32m $appname \033[0m"
+fi
+
+# APP软件客服
+echo
+echo -n -e "请输入APP客服QQ [默认:Fyue/飞跃QQ ]"
+read adminqq
+if [ -z $adminqq ]
+then
+	adminqq=1797106720
+	echo -e "\033[1;34mAPP客服QQ已设置为：\033[32m $adminqq \033[0m" ;
+else
+	echo -e "\033[1;34mAPP客服QQ已设置为：\033[32m $adminqq \033[0m"
+fi
+echo
+echo -n -e "你想自定义APP图标和启动图吗？(y/n)："
+read userimg
+if [[ $userimg == 'y' || $userimg == 'Y' ]];then
+img=yes
+# APP软件图标
+echo
+echo -n -e "请输入APP图标地址 [默认:快云Logo图标 ]"
+read urlA
+if [ -z $urlA ]
+then 
+    img=no
+	echo -e "\033[1;34mAPP图标地址已设置为：\033[32m 快云Logo图标 \033[0m" ;
+else
+	echo -e "\033[1;34mAPP图标地址已设置为：\033[32m $urlA \033[0m"
+fi
+
+# APP启动图
+echo
+echo -n -e "请输入APP启动图地址 [默认:快云启动图 ]"
+read urlB
+if [ -z $urlB ]
+then 
+    img=no
+	echo -e "\033[1;34mAPP启动图地址已设置为：\033[32m 快云启动图 \033[0m" ;
+else
+	echo -e "\033[1;34mAPP启动图地址已设置为：\033[32m $urlB \033[0m"
+fi
+else
+img=no
+fi
+sleep 0.5
+clear
+echo -e "\033[1;34m好啦！自定义信息已全部收集完毕，脚本将全自动完成下面步骤
+给你两分钟时间去群里装个逼,或者狠狠撸一发( www.52avav.com )\033[0m"
+echo
+echo -n -e "\033[1;34m回车开始快云免流独家两分钟极速安装 \033[0m"
+read
+clear 
+NowV=`uname -r`
+if [ $NowV != '4.13.7-1.el7.elrepo.x86_64' ];then
+  if [ ! -e "/opt/BBR_elrepo_install" ];then
+     echo -e "系统检测到你的服务器不是最新版内核4.13.7-1.el7.elrepo.x86_64\n开始为你升级服务器内核(大概需要1~2分钟时间,根据服务器性能决定快慢)"
+     rpm --import https://elrepo.org/RPM-GPG-KEY-elrepo.org
+     rpm -Uvh https://elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm
+     yum --enablerepo=elrepo-kernel -y install kernel-ml kernel-ml-devel
+     grub2-set-default 0
+     echo 'kuaiyum.com'>>/opt/BBR_elrepo_install
+     echo '恭喜你升级内核完成，骚后我们将帮你开启BBR加速，手动重启服务器即可生效'
+  else
+	 echo -e "\033[34m---------------------------------------------\n\n你已经升级过内核啦，请手动重启服务器即可生效\n\n---------------------------------------------\033[0m"
+  fi
+  sleep 2
+fi
+clear
+echo -e "开始整理安装环境..."
+CURTIME=`date +"%Y-%m-%d %H:%M:%S"`; #获取开始时间
+yum install psmisc -y >/dev/null 2>&1
+rm -rf /Data 
+rm -rf /etc/Kyun
+rm -rf /home/*
+rm -rf /etc/openvpn 
+rm -rf /root/*
+rm -rf /bin/Ky 
+rm -rf /bin/Kps
+rm -rf /etc/rc.local
+rm -rf /var/lib/mysql
+rm -rf /bin/K666
+rm -rf /etc/yum.repos.d/CentOS-Base.repo.bak
+killall K666 >/dev/null 2>&1  
+killall Ky >/dev/null 2>&1  
+killall Kps >/dev/null 2>&1   
+systemctl stop httpd.service >/dev/null 2>&1   
+systemctl stop mariadb.service >/dev/null 2>&1  
+systemctl stop openvpn@server-*.service >/dev/null 2>&1  
+yum remove -y openvpn httpd mariadb-server mariadb >/dev/null 2>&1 
+yum remove -y php php-mysql php-gd libjpeg* php-ldap php-odbc php-pear php-xml php-xmlrpc php-mbstring php-bcmath php-mhash php-fpm >/dev/null 2>&1
+echo && echo -e "正在更换安装源..."
+if [[ $fwq != '阿里云'  ||  $fwq != '腾讯云'  ||  $fwq != '小鸟云' ]];then
+  mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.bak
+  wget -q -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+  yum clean all >/dev/null 2>&1
+  yum makecache >/dev/null 2>&1  
+fi
+yum -y install unzip tar expect epel-release >/dev/null 2>&1
+rm -rf /etc/sysctl.conf
+echo "# 解决微信QQ卡顿问题
+net.ipv4.ip_forward = 1
+net.ipv4.conf.default.rp_filter = 1
+net.ipv4.conf.default.accept_source_route = 0
+kernel.sysrq = 0
+kernel.core_uses_pid = 1
+net.ipv4.tcp_syncookies = 1
+net.bridge.bridge-nf-call-ip6tables = 0
+net.bridge.bridge-nf-call-iptables = 0
+net.bridge.bridge-nf-call-arptables = 0
+kernel.msgmnb = 65536
+kernel.msgmax = 65536
+kernel.shmmax = 68719476736
+kernel.shmall = 4294967296
+fs.file-max = 789972
+# 提高系统限制和BBR加速
+net.core.rmem_max = 67108864
+net.core.wmem_max = 67108864
+net.core.netdev_max_backlog = 250000
+net.core.somaxconn = 32768
+net.core.default_qdisc = fq
+net.ipv4.tcp_congestion_control = bbr">>/etc/sysctl.conf 
+# 加载bridge模块
+modprobe bridge
+sysctl -p >/dev/null 2>&1 
+echo && echo -e "正在配置防火墙..."
+setenforce 0 >/dev/null 2>&1
+sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 systemctl stop firewalld.service >/dev/null 2>&1
 systemctl disable firewalld.service >/dev/null 2>&1
+yum install iptables iptables-services -y >/dev/null 2>&1
 systemctl restart iptables.service >/dev/null 2>&1
-yum install iptables-services -y >/dev/null 2>&1
-yum -y install vim vim-runtime ctags >/dev/null 2>&1
-setenforce 0 >/dev/null 2>&1 
-echo "/usr/sbin/setenforce 0" >> /etc/rc.local >/dev/null 2>&1
-echo -e "\033[36m配置完成\033[0m"
-sleep 1
-
-	
-	
-echo
-echo -e "\033[35m正在配置网速优化...\033[0m"
-cd /etc/
-rm -rf ./${sysctl}
-wget ${https}${hostfile}/${sysctl} >/dev/null 2>&1
-sleep 1
-chmod 0777 ./${sysctl}
-sysctl -p >/dev/null 2>&1
-echo -e "\033[36m优化完成\033[0m"
-sleep 1
-	
-echo
-echo -e "\033[35m正在配置防火墙...\033[0m"
-systemctl start iptables >/dev/null 2>&1
-systemctl restart iptables >/dev/null 2>&1
-iptables -F >/dev/null 2>&1
-sleep 3
-iptables -t nat -A POSTROUTING -s 10.0.0.0/16 -o eth0 -j MASQUERADE
-iptables -t nat -A POSTROUTING -s 10.0.0.0/16 -j SNAT --to-source $IP
-iptables -t nat -A POSTROUTING -s 10.5.0.0/16 -o eth0 -j MASQUERADE
-iptables -t nat -A POSTROUTING -s 10.5.0.0/16 -j SNAT --to-source $IP
-iptables -t nat -A POSTROUTING -s 10.6.0.0/16 -o eth0 -j MASQUERADE
-iptables -t nat -A POSTROUTING -s 10.6.0.0/16 -j SNAT --to-source $IP
-iptables -t nat -A POSTROUTING -s 10.8.0.0/16 -o eth0 -j MASQUERADE
-iptables -t nat -A POSTROUTING -s 10.8.0.0/16 -j SNAT --to-source $IP
-iptables -t nat -A POSTROUTING -j MASQUERADE
-iptables -t nat -A PREROUTING -p tcp -m tcp --dport 361 -j DNAT --to-destination $IP:137
-iptables -t nat -A PREROUTING -p tcp -m tcp --dport 138 -j DNAT --to-destination $IP:137
-iptables -t nat -A PREROUTING -p tcp -m tcp --dport 440 -j DNAT --to-destination $IP:$vpnport
-iptables -t nat -A PREROUTING -p tcp -m tcp --dport 3389 -j DNAT --to-destination $IP:$vpnport
-iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 28080 -j ACCEPT
-iptables -A INPUT -p TCP --dport $vpnport -j ACCEPT
-iptables -A INPUT -p TCP --dport $port -j ACCEPT
-iptables -A INPUT -p TCP --dport $mpport -j ACCEPT
-iptables -A INPUT -p TCP --dport $sqport -j ACCEPT
-iptables -A INPUT -p TCP --dport 135 -j ACCEPT
-iptables -A INPUT -p TCP --dport 136 -j ACCEPT
-iptables -A INPUT -p TCP --dport 137 -j ACCEPT
-iptables -A INPUT -p TCP --dport 138 -j ACCEPT
-iptables -A INPUT -p TCP --dport 139 -j ACCEPT
-iptables -A INPUT -p TCP --dport 366 -j ACCEPT
-iptables -A INPUT -p TCP --dport 351 -j ACCEPT
-iptables -A INPUT -p TCP --dport 265 -j ACCEPT
-iptables -A INPUT -p TCP --dport 524 -j ACCEPT
-iptables -A INPUT -p TCP --dport 3389 -j ACCEPT
-iptables -A INPUT -p TCP --dport 180 -j ACCEPT
-iptables -A INPUT -p TCP --dport 366 -j ACCEPT
-iptables -A INPUT -p TCP --dport 53 -j ACCEPT
-iptables -A INPUT -p TCP --dport 80 -j ACCEPT
-iptables -A INPUT -p TCP --dport 22 -j ACCEPT
-iptables -A INPUT -p TCP --dport 25 -j DROP
-iptables -A INPUT -p udp --dport 53 -j ACCEPT
-iptables -A INPUT -p udp --dport 138 -j ACCEPT
-iptables -A INPUT -p udp --dport 137 -j ACCEPT
-iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+# 清空所有防火墙规则
+iptables -F
+iptables -F -t nat
 service iptables save >/dev/null 2>&1
-service iptables restart >/dev/null 2>&1
+iptables -A INPUT -s 127.0.0.1/32  -j ACCEPT
+iptables -A INPUT -d 127.0.0.1/32  -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 440 -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 443 -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 8080 -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport $webdk -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 666 -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 1194 -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 138 -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 137 -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 3389 -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 3306 -j ACCEPT
+iptables -A INPUT -p udp -m udp --dport 137 -j ACCEPT
+iptables -A INPUT -p udp -m udp --dport 138 -j ACCEPT
+iptables -A INPUT -p udp -m udp --dport 53 -j ACCEPT
+iptables -A INPUT -p udp -m udp --dport 68 -j ACCEPT
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -P INPUT DROP 
+iptables -t nat  -A POSTROUTING -s 10.9.0.0/24 -o $wangka -j MASQUERADE
+iptables -t nat  -A POSTROUTING -s 10.8.0.0/24 -o $wangka -j MASQUERADE
+iptables -t nat  -A POSTROUTING -s 10.7.0.0/24 -o $wangka -j MASQUERADE
+iptables -t nat  -A POSTROUTING -s 10.6.0.0/24 -o $wangka -j MASQUERADE
+iptables -t nat  -A POSTROUTING -s 10.5.0.0/24 -o $wangka -j MASQUERADE
+iptables -t nat  -A POSTROUTING -s 10.4.0.0/24 -o $wangka -j MASQUERADE
+iptables -t nat -A POSTROUTING -j MASQUERADE
+iptables -t nat -A PREROUTING -p tcp -m tcp --dport 440 -j DNAT --to-destination $IP:443
+service iptables save >/dev/null 2>&1
 systemctl restart iptables.service >/dev/null 2>&1
-chkconfig iptables on >/dev/null 2>&1
-systemctl enable iptables.service >/dev/null 2>&1
-setenforce 0 >/dev/null 2>&1
-echo -e "\033[36m配置完成\033[0m"
-sleep 1
+return 1
+}
 
-echo
-echo -e "\033[35m正在同步系统时间...\033[0m"
-systemctl stop ntpd.service >/dev/null 2>&1
-service ntpd stop >/dev/null 2>&1
-\cp -rf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime >/dev/null 2>&1
-ntpServer=(
-[0]=s2c.time.edu.cn
-[1]=s2m.time.edu.cn
-[2]=s1a.time.edu.cn
-[3]=s2g.time.edu.cn
-[4]=s2k.time.edu.cn
-[5]=cn.ntp.org.cn
-)
-serverNum=`echo ${#ntpServer[*]}`
-NUM=0
-for (( i=0; i<=$serverNum; i++ )); do
-echo -en "正在和NTP服务器 \033[34m${ntpServer[$NUM]} \033[0m 同步中..."
-ntpdate ${ntpServer[$NUM]} >> /dev/null 2>&1
-if [ $? -eq 0 ]; then
-	 echo -e "\t\t\t[  \e[1;32mOK\e[0m  ]"
-	 echo -e "当前时间：\033[34m$(date -d "2 second" +"%Y-%m-%d %H:%M.%S")\033[0m"
-	 break
-else
-	 echo -e "\t\t\t[  \e[1;31mERROR\e[0m  ]"
-	 let NUM++
-fi
-sleep 2
-done
-hwclock --systohc
-systemctl start ntpd.service >/dev/null 2>&1
-service ntpd start >/dev/null 2>&1
-echo -e "\033[36m同步完成\033[0m"
-
-echo
-clear
-echo -e "\033[35m正在安装主程序...\033[0m"
-echo
-echo -e "\033[33m注意：程序正在为您在后台安装程序并非卡住，请耐心等待...\033[0m"
-rpm –ivh ${https}${hostfile}/openvpn-2.3.12-1.el7.x86_64.rpm >/dev/null 2>&1
-yum makecache >/dev/null 2>&1
-yum install -y openvpn telnet >/dev/null 2>&1
-yum install -y openssl openssl-devel lzo lzo-devel pam pam-devel automake pkgconfig expect >/dev/null 2>&1
-fi
-cd /etc/openvpn/ 
-rm -rf /etc/openvpn/server.conf >/dev/null 2>&1
-rm -rf /etc/openvpn/udp137.conf >/dev/null 2>&1
-rm -rf /etc/openvpn/udp138.conf >/dev/null 2>&1
-rm -rf /etc/openvpn/udp53.conf >/dev/null 2>&1
-clear
-echo '##################################
-#       OpenVPN - qyun.ren       #
-#           2017.03.02           #
-##################################
-port 443
-proto tcp
-dev tun
-ca /etc/openvpn/easy-rsa/keys/ca.crt
-cert /etc/openvpn/easy-rsa/keys/centos.crt
-key /etc/openvpn/easy-rsa/keys/centos.key
-dh /etc/openvpn/easy-rsa/keys/dh2048.pem
-auth-user-pass-verify /etc/openvpn/login.sh via-env
-client-disconnect /etc/openvpn/disconnect.sh
-client-connect /etc/openvpn/connect.sh
-verify-client-cert none
-username-as-common-name
-script-security 3
-server 10.0.0.0 255.255.0.0
-sndbuf 0
-rcvbuf 0
-push "sndbuf 393216"
-push "rcvbuf 393216"
-push "redirect-gateway def1 bypass-dhcp"
-push "dhcp-option DNS 119.29.29.29"
-push "dhcp-option DNS 114.114.114.114"
-client-to-client
-keepalive 10 120
-management localhost 7505
-tls-auth /etc/openvpn/easy-rsa/ta.key 0  
-comp-lzo
-persist-key
-persist-tun
-status /home/wwwroot/default/res/tcp.txt
-log /etc/openvpn/openvpn.log
-log-append /etc/openvpn/openvpn.log
-verb 3' >/etc/openvpn/server.conf
-
-echo '##################################
-#       OpenVPN - qyun.ren       #
-#           2017.03.02           #
-##################################
-port 53
-proto udp
-dev tun
-ca /etc/openvpn/easy-rsa/keys/ca.crt
-cert /etc/openvpn/easy-rsa/keys/centos.crt
-key /etc/openvpn/easy-rsa/keys/centos.key
-dh /etc/openvpn/easy-rsa/keys/dh2048.pem
-auth-user-pass-verify /etc/openvpn/loginudp.sh via-env
-client-disconnect /etc/openvpn/disconnectudp.sh
-client-connect /etc/openvpn/connect.sh
-verify-client-cert none
-username-as-common-name
-script-security 3
-server 10.8.0.0 255.255.255.0
-push "redirect-gateway def1 bypass-dhcp"
-push "dhcp-option DNS 119.29.29.29"
-push "dhcp-option DNS 114.114.114.114"
-client-to-client
-keepalive 10 120
-management localhost 7508
-tls-auth /etc/openvpn/easy-rsa/ta.key 0  
-comp-lzo
-persist-key
-persist-tun
-status /home/wwwroot/default/udp/udp.txt
-log /etc/openvpn/udp53.log
-log-append /etc/openvpn/udp53.log
-verb 3' >/etc/openvpn/udp53.conf
-
-wget ${https}${hostfile}/${EasyRSA} >/dev/null 2>&1
-tar -zxvf ${EasyRSA} >/dev/null 2>&1
-rm -rf /etc/openvpn/${EasyRSA} >/dev/null 2>&1
-chmod -R 0777 /etc/openvpn/
-systemctl enable openvpn@server.service >/dev/null 2>&1
-sleep 1
-cp /etc/openvpn/easy-rsa/keys/ca.crt /home/ >/dev/null 2>&1
-cp /etc/openvpn/easy-rsa/ta.key /home/ >/dev/null 2>&1
-echo "创建vpn启动命令..."
-echo "echo -e '\033[33m正在重启openvpn服务...\033[0m'
-killall openvpn >/dev/null 2>&1
-systemctl stop openvpn@server.service
-systemctl start openvpn@server.service
-killall udp >/dev/null 2>&1
-udp -l $mpport -d >/dev/null 2>&1
-udp -l 135 -d >/dev/null 2>&1
-udp -l 136 -d >/dev/null 2>&1
-udp -l 137 -d >/dev/null 2>&1
-udp -l 138 -d >/dev/null 2>&1
-udp -l 139 -d >/dev/null 2>&1
-udp -l 53 -d >/dev/null 2>&1
-udp -l 3389 -d >/dev/null 2>&1
-udp -l 351 -d >/dev/null 2>&1
-udp -l 524 -d >/dev/null 2>&1
-udp -l 265 -d >/dev/null 2>&1
-udp -l 440 -d >/dev/null 2>&1
-udp -l 180 -d >/dev/null 2>&1
-udp -l 366 -d >/dev/null 2>&1
-killall squid >/dev/null 2>&1
-killall squid >/dev/null 2>&1
-squid -z >/dev/null 2>&1
-systemctl restart squid
-lnmp >/dev/null 2>&1
-openvpn --config /etc/openvpn/server.conf &
-openvpn --config /etc/openvpn/udp53.conf &
-killall jiankong >/dev/null 2>&1
-killall backups.sh >/dev/null 2>&1
-/home/wwwroot/default/res/jiankong >>/home/jiankong.log 2>&1 &
-/home/wwwroot/default/udp/jiankong >>/home/jiankong.log 2>&1 &
-/etc/openvpn/backups.sh >>/home/wwwroot/backups.log 2>&1 &
-echo -e '服务状态：			  [\033[32m  OK  \033[0m]'
-exit 0;
-" >/bin/vpn
-chmod 777 /bin/vpn
-chmod +x /etc/rc.d/rc.local
-echo "sh /bin/vpn" >>/etc/rc.d/rc.local
-echo -e "\033[36m命令创建成功！\033[0m"
-sleep 1
-clear
-echo -e "\033[35m正在安装设置HTTP代理端口...\033[0m"
-sleep 2
-yum -y install squid >/dev/null 2>&1
-cd /etc/squid/
-rm -rf ./squid.conf
-killall squid >/dev/null 2>&1
-sleep 1
-wget ${https}${hostfile}/${sq} >/dev/null 2>&1
-sed -i 's/http_port 80/http_port '$sqport'/g' /etc/squid/squid.conf >/dev/null 2>&1
-sleep 1
-chmod 0755 ./${sq} >/dev/null 2>&1
-echo 
-echo "正在加密常规代理..."
-sleep 2
-wget ${https}${hostfile}/${squser} >/dev/null 2>&1
-chmod 0755 ./${squser} >/dev/null 2>&1
-sleep 1
-echo 
-echo "正在启动常规代理并设置开机自启..."
-cd /etc/
-chmod 777 -R squid
-cd squid
-squid -z >/dev/null 2>&1
-systemctl restart squid >/dev/null 2>&1
-systemctl enable squid >/dev/null 2>&1
-sleep 1
-echo "常规代理安装完成"
-sleep 2
-clear
-echo -e "\033[35m正在安装HTTP转发模式...\033[0m"
-sleep 3
-cd /usr/bin/
-wget ${https}${hostfile}/${mp} >/dev/null 2>&1
-        sed -i "23s/8080/$mpport/" udp.c
-        sed -i "184s/443/$vpnport/" udp.c
-		gcc -o udp udp.c
-		rm -rf ${mp} >/dev/null 2>&1
-chmod 0777 ./udp >/dev/null 2>&1
-echo "HTTP转接模式安装完成"
-clear
-echo -e "\033[35m正在极速部署LNMP环境...\033[0m"
-echo
-echo -e "\033[33m注意：程序正在为您在后台安装程序并非卡住，请耐心等待...\033[0m"
-sed -i 's/;date.timezone/date.timezone = PRC/g' /etc/php.ini >/dev/null 2>&1
-cd /root/
-wget ${https}${hostfile}/${lnmpfile} >/dev/null 2>&1
-unzip ${lnmpfile} >/dev/null 2>&1
-rm -rf ${lnmpfile} >/dev/null 2>&1
-chmod 777 -R /root/lnmp >/dev/null 2>&1
-cd lnmp
-./install.sh >/dev/null 2>&1
-
-
-echo "#!/bin/bash
-echo '正在重启lnmp...'
-systemctl restart mariadb >/dev/null 2>&1
-
-systemctl restart nginx.service >/dev/null 2>&1
-
-systemctl restart php-fpm.service >/dev/null 2>&1
-
-systemctl restart crond.service >/dev/null 2>&1
-
-echo -e '服务状态：			  [\033[32m  OK  \033[0m]'
-exit 0;
-" >/bin/lnmp
-chmod 777 /bin/lnmp >/dev/null 2>&1
-lnmp 
-rm -rf /root/lnmp >/dev/null 2>&1
-echo -e "\033[31m安装完成！\033[0m"
-echo -e "\033[31m感谢使用青云极速lnmp系统\033[0m"
-clear
-echo -e "\033[36m开始搭建青云流量控制程序\033[0m"
-echo -e "\033[33m请不要进行任何操作 程序自动完成...\033[0m"
-cd /root/
-wget ${https}${hostfile}/phpmyadmin.tar.gz >/dev/null 2>&1
-tar -zxvf phpmyadmin.tar.gz -C /home/wwwroot/default/ >/dev/null 2>&1
-rm -f phpmyadmin.tar.gz >/dev/null 2>&1
-mv /home/wwwroot/default/phpmyadmin /home/wwwroot/default/$phpmyadmin >/dev/null 2>&1
-echo "echo -e '锁定数据库访问权限		  [\033[32m  OK  \033[0m]'
-chmod -R 644 /home/wwwroot/default/$phpmyadmin && chattr -R +i /home/wwwroot/default/$phpmyadmin
-exit 0;
-" >/bin/locksql
-chmod 777 /bin/locksql
-echo "echo -e '开启数据库目录权限		  [\033[32m  OK  \033[0m]'
-chattr -R -i /home/wwwroot/default/$phpmyadmin && chmod -R 777 /home/wwwroot/default/$phpmyadmin
-exit 0;
-" >/bin/opensql
-chmod 777 /bin/opensql
-wget ${https}${hostfile}/${webfile} >/dev/null 2>&1
-unzip -q ${webfile} >/dev/null 2>&1
-clear
+function KyunWeb() {
+echo && echo -e "正在部署LAMP环境..."
+yum -y install httpd >/dev/null 2>&1
+rm -rf /etc/httpd/conf/httpd.conf
+mv -f /root/K/httpd.conf /etc/httpd/conf/httpd.conf
+chmod 0755 -R /etc/httpd/conf/httpd.conf
+sed -i 's/8888/'$webdk'/g' /etc/httpd/conf/httpd.conf
+yum -y install mariadb-server mariadb >/dev/null 2>&1
+rm -rf /etc/my.cnf && mv -f /root/K/my.cnf /etc/my.cnf && chmod 0755 -R /etc/my.cnf
+systemctl start mariadb.service
+systemctl restart mariadb.service
+yum install -y php php-mysql php-gd libjpeg* php-ldap php-odbc php-pear php-xml php-xmlrpc php-mbstring php-bcmath php-mhash php-fpmecho >/dev/null 2>&1
+echo && echo -e "开始配置快云后台..."
+rm -rf /Data && mkdir -p /Data/wwwroot/Kyun
+cd /mnt && wget -q $KyWEB ${web}$Host/$KyWEB
+unzip -q $KyWEB && rm -rf $KyWEB
+adminuserA=$(echo -n "$adminuser" | md5sum| awk {'print$1'})
+adminuserB=u$(echo -n "$adminuserA" | md5sum| awk {'print$1'})
+adminpassA=$(echo -n "$adminpass" | md5sum| awk {'print$1'})
+adminpassB=p$(echo -n "$adminpassA" | md5sum| awk {'print$1'})
+admintwopassA=k$(echo -n "$admintwopass" | md5sum| awk {'print$1'})
+sed -i 's/MD5账号/'$adminuserB'/g' /mnt/install.sql
+sed -i 's/MD5密码/'$adminpassB'/g' /mnt/install.sql
+sed -i 's/网站名称/'$adminname'/g' /mnt/install.sql
+sed -i 's/QQ客服/'$adminqq'/g' /mnt/install.sql
+sed -i 's/hunan.kuaiyum.com:8888/'$IP:$webdk'/g' /mnt/install.sql
+sed -i 's/hunan.kuaiyum.com/'$IP'/g' /mnt/install.sql
+sed -i 's/kywlpass/'$sqlpass'/g' /mnt/Kyws/config.php
+sed -i 's/kywlpass/'$sqlpass'/g' /mnt/Data/config.php
+sed -i 's/kywltwopass/'$admintwopassA'/g' /mnt/Data/config.php
 mysqladmin -u root password "${sqlpass}"
-echo
-echo -e "正在自动加入流控数据库表：\033[31m ov \033[0m"
-echo
-mlmd5=`echo -n $ml|md5sum`
-sed -i 's/qyadmin/'$id'/g' /root/qyun/web/install.sql >/dev/null 2>&1
-sed -i 's/100340768/'$appqq'/g' /root/qyun/web/install.sql >/dev/null 2>&1
-sed -i 's/9702bec258c38676a1217f2c0c58d610/'${mlmd5%%\ *}'/g' /root/qyun/web/install.sql >/dev/null 2>&1
-sed -i 's/llwsadmin/'$llwsid'/g' /root/qyun/web/install.sql >/dev/null 2>&1
-sed -i 's/llwspass/'$llwsmm'/g' /root/qyun/web/install.sql >/dev/null 2>&1
-sed -i 's/www.qyun.ren/'${IP}:${port}'/g' /root/qyun/web/install.sql >/dev/null 2>&1
-sed -i 's/www.qyun.ren/'${IP}:${port}'/g' /root/qyun/web/install.sql >/dev/null 2>&1
-sed -i 's/qyunren1009/'${appkey}'/g' /root/qyun/web/install.sql >/dev/null 2>&1
-create_db_sql="create database IF NOT EXISTS ov"
-mysql -hlocalhost -uroot -p$sqlpass -e "${create_db_sql}"
-mysql -hlocalhost -uroot -p$sqlpass --default-character-set=utf8<<EOF
+mysql -hlocalhost -uroot -p${sqlpass} -e "create database IF NOT EXISTS Kyml"
+mysql -hlocalhost -uroot -p${sqlpass} --default-character-set=utf8<<EOF
 GRANT ALL PRIVILEGES ON *.* TO 'root'@'%'IDENTIFIED BY '${sqlpass}' WITH GRANT OPTION;
 flush privileges;
-use ov;
-source /root/qyun/web/install.sql;
+use Kyml;
+source /mnt/install.sql;
+source /mnt/line.sql;
 EOF
-echo -e "\033[34m设置数据库完成\033[0m"
-if [[ $port == "80" ]]
-then
-if [[ $sqport == "80" ]]
-then
-echo
-echo "检测到HTTP端口和流控端口有冲突，系统默认流控为1234端口"
-port=1234
-fi
-fi
-echo -e "\033[34m已设置WEB流控端口号为：$port\033[0m"
-sleep 1
-sed -i 's/80/'$port'/g' /usr/local/nginx/conf/nginx.conf >/dev/null 2>&1
-sed -i 's/80/'$port'/g' /etc/nginx/conf.d/default.conf >/dev/null 2>&1
-#sed -i 's/ServerName www.example.com:1234/ServerName www.example.com:'$port'/g' /etc/httpd/conf/httpd.conf >/dev/null 2>&1
-#sed -i 's/Listen 1234/Listen '$port'/g' /etc/httpd/conf/httpd.conf >/dev/null 2>&1
-sleep 1
-mv -f ./qyun/sh/loginudp.sh /etc/openvpn/ >/dev/null 2>&1
-mv -f ./qyun/sh/disconnectudp.sh /etc/openvpn/ >/dev/null 2>&1
-mv -f ./qyun/sh/login.sh /etc/openvpn/ >/dev/null 2>&1
-mv -f ./qyun/sh/disconnect.sh /etc/openvpn/ >/dev/null 2>&1
-mv -f ./qyun/sh/connect.sh /etc/openvpn/ >/dev/null 2>&1
-chmod +x /etc/openvpn/*.sh >/dev/null 2>&1
-chmod 777 -R ./qyun/web/* >/dev/null 2>&1
-sleep 1
-sed -i 's/qysql/'$sqlpass'/g' ./qyun/web/config.php >/dev/null 2>&1
-
-rm -rf /home/wwwroot/default/html/index* >/dev/null 2>&1
-mv -f ./qyun/web/* /home/wwwroot/default/ >/dev/null 2>&1
-chmod 777 -R /home/wwwroot/default/ >/dev/null 2>&1
-sleep 1
-
-cd /home/wwwroot/default/
-rm -rf /root/qyun/ >/dev/null 2>&1
-rm -rf /root/lnmp >/dev/null 2>&1
-rm -rf /root/${webfile} >/dev/null 2>&1
-rm -rf /root/phpmyadmin.tar.gz >/dev/null 2>&1
-sleep 1
-yum install -y crontabs >/dev/null 2>&1
-mkdir -p /var/spool/cron/ >/dev/null 2>&1
-chmod 777 /home/wwwroot/default/cron.php >/dev/null 2>&1
-echo
-echo -e "\033[35m正在安装实时流量自动监控程序...\033[0m"
-echo "* * * * * curl --silent --compressed http://${IP}:${port}/cron.php">>/var/spool/cron/root >/dev/null 2>&1
-systemctl restart crond.service  >/dev/null 2>&1   
-systemctl enable crond.service >/dev/null 2>&1 
-cd /home/wwwroot/default/
-wget ${https}${hostfile}/${jiankongfile} >/dev/null 2>&1
-unzip ${jiankongfile} >/dev/null 2>&1
-rm -rf ${jiankongfile}
-chmod 777 -R /home/wwwroot/default/res/
-chmod 777 -R /home/wwwroot/default/udp/
-cd /etc/openvpn/
-wget ${https}${hostfile}/${peizhifile} >/dev/null 2>&1
-unzip ${peizhifile} >/dev/null 2>&1
-rm -rf ${peizhifile}
-chmod 777 /etc/openvpn/peizhi.cfg >/dev/null 2>&1
-sed -i 's/shijian=30/'shijian=$jiankongs'/g' /etc/openvpn/peizhi.cfg >/dev/null 2>&1
-sed -i 's/butime=86400/'butime=$butime'/g' /etc/openvpn/peizhi.cfg >/dev/null 2>&1
-sed -i 's/mima=123456/'mima=$sqlpass'/g' /etc/openvpn/peizhi.cfg >/dev/null 2>&1
-if [[ "$llwsinstall" == "1" ]];then
-sed -i 's/apphost=www.qyunl.com/'apphost=${IP}:${port}'/g' /etc/openvpn/peizhi.cfg >/dev/null 2>&1
-sed -i 's/appkey=0542fa6e2f2de6bb5f3a7813ded625ab/'appkey=${llwskey}'/g' /etc/openvpn/peizhi.cfg >/dev/null 2>&1
-else
-sed -i 's/appopen=yes/'appopen=no'/g' /etc/openvpn/peizhi.cfg >/dev/null 2>&1
-fi
-echo "/home/wwwroot/default/res/jiankong >>/home/jiankong.log 2>&1 &">>/etc/rc.local >/dev/null 2>&1
-echo "/home/wwwroot/default/udp/jiankong >>/home/jiankong.log 2>&1 &">>/etc/rc.local >/dev/null 2>&1
-echo -e "\033[36m实时监控安装完毕\033[0m"
-echo
-echo
-echo -e "\033[35m正在安装24小时自动备份程序...\033[0m"
-cd /etc/openvpn/
-wget ${https}${hostfile}/${backups} >/dev/null 2>&1
-unzip ${backups} >/dev/null 2>&1
-rm -rf ${backups} >/dev/null 2>&1
-chmod 777 /etc/openvpn/backups.sh >/dev/null 2>&1
-echo "/etc/openvpn/backups.sh >>/home/backups.log 2>&1 &">>/etc/rc.local >/dev/null 2>&1
-echo -e "\033[36m安装完成\033[0m"
-vpn >/dev/null 2>&1
-lnmp
-echo -e "\033[35m正在置为开机启动...\033[0m"
-systemctl enable openvpn@server.service >/dev/null 2>&1
-echo 
-echo -e "\033[35mWeb流量控制程序安装完成...\033[0m"
-echo 
-echo "开始生成配置文件..."
-sleep 3
-cd /home/
-echo "# 青云云免配置 联通空中卡53UDP
-# 本文件由系统自动生成
-# 类型：UDP类型
-client
-dev tun
-proto udp
-remote $IP 53">http-yd-quanguo1.ovpn
-echo 'resolv-retry infinite
-nobind
-persist-key
-persist-tun
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17"
-push route 114.114.114.114 114.114.115.115
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-auth-user-pass
-ns-cert-type server
-comp-lzo
-verb 3
-'>http-yd-quanguo2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd-quanguo3.ovpn
-cat http-yd-quanguo1.ovpn http-yd-quanguo2.ovpn http-yd-quanguo3.ovpn>qyun-yd-udp53.ovpn
-
-echo "# 青云云免配置 移动全国137UDP
-# 本文件由系统自动生成
-# 类型：UDP类型
-client
-dev tun
-proto udp
-remote $IP 137">http-yd-quanguo1.ovpn
-echo 'resolv-retry infinite
-nobind
-persist-key
-persist-tun
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17"
-push route 114.114.114.114 114.114.115.115
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-auth-user-pass
-ns-cert-type server
-comp-lzo
-verb 3
-'>http-yd-quanguo2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd-quanguo3.ovpn
-cat http-yd-quanguo1.ovpn http-yd-quanguo2.ovpn http-yd-quanguo3.ovpn>qyun-yd-udp137.ovpn
-
-
-echo "# 青云云免配置 移动全国138UDP
-# 本文件由系统自动生成
-# 类型：UDP类型
-client
-dev tun
-proto udp
-remote $IP 138">http-yd-quanguo1.ovpn
-echo 'resolv-retry infinite
-nobind
-persist-key
-persist-tun
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17"
-push route 114.114.114.114 114.114.115.115
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-auth-user-pass
-ns-cert-type server
-comp-lzo
-verb 3
-'>http-yd-quanguo2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd-quanguo3.ovpn
-cat http-yd-quanguo1.ovpn http-yd-quanguo2.ovpn http-yd-quanguo3.ovpn>qyun-yd-udp138.ovpn
-
-
-echo "# 青云云免配置 上海移动
-# 本文件由系统自动生成
-# 类型：
-client
-dev tun
-proto tcp
-http-proxy $IP 8080">http-yd-quanguo1.ovpn
-echo 'http-proxy-option EXT1 qyunl 127.0.0.1:440
-http-proxy-option EXT1 "X-Online-Host: wap.sh.10086.cn" 
-http-proxy-option EXT1 "Host: wap.sh.10086.cn"
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17"
-route 0.0.0.0 0.0.0.0 vpn_gateway
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-auth-user-pass
-comp-lzo
-verb 3
-'>http-yd-quanguo2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd-quanguo3.ovpn
-cat http-yd-quanguo1.ovpn http-yd-quanguo2.ovpn http-yd-quanguo3.ovpn>qyun-yd-sh.ovpn
-
-
-echo "# 青云云免配置 移动全国1
-# 本文件由系统自动生成
-# 类型：
-client
-dev tun
-proto tcp
-remote / 3389
-http-proxy-option EXT1 "CONNECT / wap.cmvideo.cn"
-http-proxy-option EXT1 "Host: wap.cmvideo.cn:443 / HTTP/1.1"
-http-proxy 10.0.0.172 80
-http-proxy-option EXT1 "Host: wap.cmvideo.cn"
-http-proxy-option EXT1 "POST  wap.cmvideo.cn"
-http-proxy-option EXT1 VPN
-http-proxy $IP 8080">http-yd-quanguo1.ovpn
-echo 'resolv-retry infinite
-nobind
-persist-key
-persist-tun
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17"
-route 0.0.0.0 0.0.0.0 vpn_gateway
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-auth-user-pass
-comp-lzo
-verb 3
-'>http-yd-quanguo2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd-quanguo3.ovpn
-cat http-yd-quanguo1.ovpn http-yd-quanguo2.ovpn http-yd-quanguo3.ovpn>qyun-yd-qg1.ovpn
-
-echo "# 青云云免配置 移动全国2
-# 本文件由系统自动生成
-# 类型：
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-client
-dev tun
-proto tcp
-
-remote sdc.10086.cn 80
-http-proxy-option EXT1 VPN 127.0.0.1:443
-http-proxy-option EXT1 "POST http://sdc.10086.cn/ HTTP/1.1"
-http-proxy-option EXT1 "GET http://sdc.10086.cn/ HTTP/1.1"
-http-proxy-option EXT1 "Host: sdc.10086.cn"
-http-proxy-option EXT1 "X-Online-Host: sdc.10086.cn"
-http-proxy $IP 138">http-yd-quanguo1.ovpn
-echo 'resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd-quanguo2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd-quanguo3.ovpn
-cat http-yd-quanguo1.ovpn http-yd-quanguo2.ovpn http-yd-quanguo3.ovpn>qyun-yd-qg2.ovpn
-
-
-
-echo "# 青云云免配置 四川移动
-# 本文件由系统自动生成
-# 类型：HTTP转接
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-client
-dev tun
-proto tcp
-
-remote / 80
-;http-proxy-retry
-;http-proxy [proxy server] [proxy port]
-http-proxy 10.0.0.172 80
-http-proxy-option EXT1 " "Host:$IP:3389
-http-proxy-option EXT1 Host:wap.sc.10086.cn">http-yd-quanguo1.ovpn
-echo 'resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd-quanguo2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd-quanguo3.ovpn
-cat http-yd-quanguo1.ovpn http-yd-quanguo2.ovpn http-yd-quanguo3.ovpn>qyun-yd-sc.ovpn
-
-echo "# 青云云免配置 广东移动
-# 本文件由系统自动生成
-# 类型：HTTP转接
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-client
-dev tun
-proto tcp
-http-proxy-option EXT1 VPN 127.0.0.1:440
-http-proxy-option EXT1 "X-Online-Host: wap.gd.10086.cn" 
-http-proxy-option EXT1 "Host: wap.gd.10086.cn"
-http-proxy $IP 8080">http-yd-quanguo1.ovpn
-echo 'remote wap.gd.10086.cn 80
-
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd-quanguo2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd-quanguo3.ovpn
-cat http-yd-quanguo1.ovpn http-yd-quanguo2.ovpn http-yd-quanguo3.ovpn>qyun-yd-gd.ovpn
-
-echo "# 青云云免配置 重庆移动
-# 本文件由系统自动生成
-# 类型：HTTP转接
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-client
-dev tun
-proto tcp
-
-remote wap.cq.10086.cn 3389
-http-proxy-option EXT1 "POST http://wap.cq.10086.cn"
-http-proxy-option EXT1 "Host: wap.cq.10086.cn/HTTP/1.1"
-http-proxy-option EXT1 "VPN"
-http-proxy $IP 138">http-yd-quanguo1.ovpn
-echo 'remote wap.gd.10086.cn 80
-
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd-quanguo2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd-quanguo3.ovpn
-cat http-yd-quanguo1.ovpn http-yd-quanguo2.ovpn http-yd-quanguo3.ovpn>qyun-yd-cq.ovpn
-
-echo "# 青云云免配置 浙江移动
-# 本文件由系统自动生成
-# 类型：HTTP转接
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-client
-dev tun
-proto tcp
-
-remote / 80
-;http-proxy-retry
-;http-proxy [proxy server] [proxy port]
-http-proxy 10.0.0.172 80
-http-proxy-option EXT1 " "Host:$IP:443">http-yd-quanguo1.ovpn
-echo 'http-proxy-option EXT1 Host:wap.zj.10086.cn 
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd-quanguo2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd-quanguo3.ovpn
-cat http-yd-quanguo1.ovpn http-yd-quanguo2.ovpn http-yd-quanguo3.ovpn>qyun-yd-zj.ovpn
-
-
-echo "# 青云云免配置 云南移动
-# 本文件由系统自动生成
-# 类型：HTTP转接
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-client
-dev tun
-proto tcp
-
-remote wap.yn.10086.cn 3389
-http-proxy-option EXT1 "POST http://wap.yn.10086.cn"
-http-proxy-option EXT1 "Host: wap.yn.10086.cn/HTTP/1.1"
-http-proxy-option EXT1 "VPN"
-http-proxy $IP 138">http-yd-quanguo1.ovpn
-echo 'resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd-quanguo2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd-quanguo3.ovpn
-cat http-yd-quanguo1.ovpn http-yd-quanguo2.ovpn http-yd-quanguo3.ovpn>qyun-yd-yn.ovpn
-
-
-echo "# 青云云免配置 深圳移动
-# 本文件由系统自动生成
-# 类型：HTTP转接
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-client
-dev tun
-proto tcp
-
-remote wap.gd.chinamobile.com 80
-http-proxy-option EXT1 "VPN 127.0.0.1:443"
-http-proxy-option EXT1 "X-Online-Host: wap.gd.chinamobile.com" 
-http-proxy-option EXT1 "Host: wap.gd.chinamobile.com"
-http-proxy $IP 8080">http-yd-quanguo1.ovpn
-echo 'resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd-quanguo2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd-quanguo3.ovpn
-cat http-yd-quanguo1.ovpn http-yd-quanguo2.ovpn http-yd-quanguo3.ovpn>qyun-yd-sz.ovpn
-
-
-echo "# 青云云免配置 汕头移动
-# 本文件由系统自动生成
-# 类型：HTTP转接
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-client
-dev tun
-proto tcp
-
-remote wap.gd.10086.cn 80
-http-proxy $IP 8080">http-yd-quanguo1.ovpn
-echo 'http-proxy-option EXT1 VPN 127.0.0.1:443
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd-quanguo2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd-quanguo3.ovpn
-cat http-yd-quanguo1.ovpn http-yd-quanguo2.ovpn http-yd-quanguo3.ovpn>qyun-yd-st.ovpn
-
-
-echo "# 青云云免配置 山西移动
-# 本文件由系统自动生成
-# 类型：HTTP转接
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-client
-dev tun
-proto tcp
-
-remote wap.sx.10086.cn 3389
-http-proxy-option EXT1 "POST http://wap.sx.10086.cn"
-http-proxy-option EXT1 "Host: wap.sx.10086.cn/HTTP/1.1"
-http-proxy-option EXT1 "VPN"
-http-proxy $IP 138">http-yd-quanguo1.ovpn
-echo 'resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd-quanguo2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd-quanguo3.ovpn
-cat http-yd-quanguo1.ovpn http-yd-quanguo2.ovpn http-yd-quanguo3.ovpn>qyun-yd-sx.ovpn
-
-
-echo "# 青云云免配置 山东移动
-# 本文件由系统自动生成
-# 类型：HTTP转接
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-client
-dev tun
-proto tcp
-
-remote wap.sd.10086.cn 80
-http-proxy-option EXT1 "POST http://wap.sd.10086.cn"
-http-proxy-option EXT1 "Host: wap.sd.10086.cn/HTTP/1.1"
-http-proxy-option EXT1 "VPN"
-http-proxy $IP 138">http-yd-quanguo1.ovpn
-echo 'resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd-quanguo2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd-quanguo3.ovpn
-cat http-yd-quanguo1.ovpn http-yd-quanguo2.ovpn http-yd-quanguo3.ovpn>qyun-yd-sd.ovpn
-
-
-echo "# 青云云免配置 辽宁移动
-# 本文件由系统自动生成
-# 类型：HTTP转接
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-client
-dev tun
-proto tcp
-
-remote wap.ln.10086.cn 3389
-http-proxy-option EXT1 "POST http://wap.ln.10086.cn"
-http-proxy-option EXT1 "Host: wap.ln.10086.cn/HTTP/1.1"
-http-proxy-option EXT1 "VPN"
-http-proxy $IP 138">http-yd-quanguo1.ovpn
-echo 'resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd-quanguo2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd-quanguo3.ovpn
-cat http-yd-quanguo1.ovpn http-yd-quanguo2.ovpn http-yd-quanguo3.ovpn>qyun-yd-ln.ovpn
-
-
-echo "# 青云云免配置 吉林移动
-# 本文件由系统自动生成
-# 类型：HTTP转接
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-client
-dev tun
-proto tcp
-
-remote wap.jl.10086.cn 3389
-http-proxy-option EXT1 "POST http://wap.jl.10086.cn"
-http-proxy-option EXT1 "Host: wap.jl.10086.cn/HTTP/1.1"
-http-proxy-option EXT1 "VPN"
-http-proxy $IP 137">http-yd-quanguo1.ovpn
-echo 'resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd-quanguo2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd-quanguo3.ovpn
-cat http-yd-quanguo1.ovpn http-yd-quanguo2.ovpn http-yd-quanguo3.ovpn>qyun-yd-jl.ovpn
-
-
-echo "# 青云云免配置 湖南移动
-# 本文件由系统自动生成
-# 类型：HTTP转接
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-client
-dev tun
-proto tcp
-
-remote wap.hn.chinamobile.com 80
-http-proxy-option EXT1 "POST http://wap.hn.chinamobile.com"
-http-proxy-option EXT1 "Host: wap.hn.chinamobile.com/HTTP/1.1"
-http-proxy-option EXT1 "VPN"
-http-proxy $IP 138">http-yd-quanguo1.ovpn
-echo 'resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd-quanguo2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd-quanguo3.ovpn
-cat http-yd-quanguo1.ovpn http-yd-quanguo2.ovpn http-yd-quanguo3.ovpn>qyun-yd-hunan.ovpn
-
-
-echo "# 青云云免配置 河南移动
-# 本文件由系统自动生成
-# 类型：HTTP转接
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-client
-dev tun
-proto tcp
-
-remote wap.ha.10086.cn 80
-http-proxy-option EXT1 "VPN"
-http-proxy-option EXT1 "POST http://wap.ha.10086.cn"
-http-proxy-option EXT1 "Host: wap.ha.10086.cn/HTTP/1.1"
-http-proxy $IP 138">http-yd-quanguo1.ovpn
-echo 'resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd-quanguo2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd-quanguo3.ovpn
-cat http-yd-quanguo1.ovpn http-yd-quanguo2.ovpn http-yd-quanguo3.ovpn>qyun-yd-henan.ovpn
-
-
-echo "# 青云云免配置 河北移动
-# 本文件由系统自动生成
-# 类型：HTTP转接
-client
-dev tun
-proto tcp
-http-proxy-option EXT1 VPN 127.0.0.1:443
-http-proxy-option EXT1 "GET http//:hf.mm.10086.cn / HTTP/1.1"
-http-proxy-option EXT1 "Host: hf.mm.10086.cn "
-http-proxy-option EXT1 "X-Online-Host: hf.mm.10086.cn "
-http-proxy $IP 138">http-yd-quanguo1.ovpn
-echo 'remote hf.mm.10086.cn
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17"
-push route 114.114.114.114 114.114.115.115
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-auth-user-pass
-ns-cert-type server
-comp-lzo
-verb 3
-'>http-yd-quanguo2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd-quanguo3.ovpn
-cat http-yd-quanguo1.ovpn http-yd-quanguo2.ovpn http-yd-quanguo3.ovpn>qyun-yd-hebei.ovpn
-
-
-echo "# 青云云免配置 广州移动
-# 本文件由系统自动生成
-# 类型：HTTP转接
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-client
-dev tun
-proto tcp
-http-proxy-option EXT1 "VPN 127.0.0.1:443"
-http-proxy-option EXT1 "X-Online-Host: gslb.miguvod.lovev.com" 
-http-proxy-option EXT1 "Host: gslb.miguvod.lovev.com"
-http-proxy $IP  8080">http-yd-quanguo1.ovpn
-echo 'remote gslb.miguvod.lovev.com 80 tcp-client
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd-quanguo2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd-quanguo3.ovpn
-cat http-yd-quanguo1.ovpn http-yd-quanguo2.ovpn http-yd-quanguo3.ovpn>qyun-yd-guangzhou.ovpn
-
-
-echo "# 青云云免配置 广西移动
-# 本文件由系统自动生成
-# 类型：HTTP转接
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-client
-dev tun
-proto tcp
-
-remote wap.gx.10086.cn 80
-http-proxy-option EXT1 "POST http://wap.gx.10086.cn"
-http-proxy-option EXT1 "Host: wap.gx.10086.cn/HTTP/1.1"
-http-proxy-option EXT1 "VPN"
-http-proxy $IP 137">http-yd-quanguo1.ovpn
-echo 'resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd-quanguo2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd-quanguo3.ovpn
-cat http-yd-quanguo1.ovpn http-yd-quanguo2.ovpn http-yd-quanguo3.ovpn>qyun-yd-guangxi.ovpn
-
-echo "# 青云云免配置 江西移动
-# 本文件由系统自动生成
-# 类型：HTTP转接
-client
-dev tun
-http-proxy-option EXT1 "POST http://www.jx.10086.cn/HTTP/1.1"
-http-proxy-option EXT1 "Host: www.jx.10086.cn"
-http-proxy-option EXT1 "VPN 127.0.0.1:443"
-http-proxy $IP 137">http-yd-quanguo1.ovpn
-echo 'remote www.jx.10086.cn 80 tcp-client
-connect-retry-max 5
-connect-retry 5
-resolv-retry 30
-nobind
-persist-key
-persist-tun
-verb 3
-script-security 2
-auth-user-pass
-#auth-user-pass userpass.txt
-status-version 2
-status status 8
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd-quanguo2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd-quanguo3.ovpn
-cat http-yd-quanguo1.ovpn http-yd-quanguo2.ovpn http-yd-quanguo3.ovpn>qyun-yd-jiangxi.ovpn
-
-
-echo "# 青云云免配置 甘肃移动
-# 本文件由系统自动生成
-# 类型：HTTP转接
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-client
-dev tun
-proto tcp
-remote $IP:443/rX-Online-Host:wap.10086.cn ">http-yd-quanguo1.ovpn
-echo 'http-proxy 10.0.0.172 80
-http-proxy-option EXT1 u201cHost: wap.10086.cn u201c
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd-quanguo2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd-quanguo3.ovpn
-cat http-yd-quanguo1.ovpn http-yd-quanguo2.ovpn http-yd-quanguo3.ovpn>qyun-yd-gansu.ovpn
-
-
-echo "# 青云云免配置 茂名移动
-# 本文件由系统自动生成
-# 类型：HTTP转接
-setenv IV_GUI_VER de.blinkt.openvpn 0.6.17 
-machine-readable-output
-client
-dev tun
-proto tcp
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-remote wlanwm.12530.com 80
-http-proxy $IP 8080">http-yd-quanguo1.ovpn
-echo 'http-proxy-option EXT1 qyunl 127.0.0.1:443
-http-proxy-option EXT1 "X-Online-Host: wlanwm.12530.com"
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd-quanguo2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd-quanguo3.ovpn
-cat http-yd-quanguo1.ovpn http-yd-quanguo2.ovpn http-yd-quanguo3.ovpn>qyun-yd-maom.ovpn
-
-
-echo "# 青云云免配置 辽宁移动2
-# 本文件由系统自动生成
-# 类型：HTTP转接
-management /data/data/de.blinkt.openvpn/cache/mgmtsocket unix
-management-client
-management-query-passwords
-management-hold
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-client
-verb 4
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-proto tcp
-dev tun
-http-proxy-option EXT1 "POST http://wap.ln.chinamobile.com/HTTP/1.1"
-http-proxy-option EXT1 "Host: wap.ln.chinamobile.com"
-http-proxy-option EXT1 "VPN 127.0.0.1:443"
-http-proxy $IP 137">http-yd1-quanguo-1.ovpn
-echo 'remote wap.ln.chinamobile.com 3389 tcp-client
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd1-quanguo-2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd1-quanguo-3.ovpn
-cat http-yd1-quanguo-1.ovpn http-yd1-quanguo-2.ovpn http-yd1-quanguo-3.ovpn>qyun-yd-ln2.ovpn
-
-
-echo "# 青云云免配置 山东移动2
-# 本文件由系统自动生成
-# 类型：HTTP转接
-management /data/data/de.blinkt.openvpn/cache/mgmtsocket unix
-management-client
-management-query-passwords
-management-hold
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-client
-verb 4
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-proto tcp
-dev tun
-http-proxy-option EXT1 "POST http://wap.sd.chinamobile.com/HTTP/1.1"
-http-proxy-option EXT1 "Host: wap.sd.chinamobile.com"
-http-proxy-option EXT1 "VPN 127.0.0.1:443"
-http-proxy $IP 137">http-yd1-quanguo-1.ovpn
-echo 'remote wap.sd.chinamobile.com 80 tcp-client
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd1-quanguo-2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd1-quanguo-3.ovpn
-cat http-yd1-quanguo-1.ovpn http-yd1-quanguo-2.ovpn http-yd1-quanguo-3.ovpn>qyun-yd-sd2.ovpn
-
-
-echo "# 青云云免配置 山西移动2
-# 本文件由系统自动生成
-# 类型：HTTP转接
-management /data/data/de.blinkt.openvpn/cache/mgmtsocket unix
-management-client
-management-query-passwords
-management-hold
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-client
-verb 4
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-proto tcp
-dev tun
-http-proxy-option EXT1 "POST http://wap.sx.10086.cn/HTTP/1.1"
-http-proxy-option EXT1 "Host: wap.sx.10086.cn"
-http-proxy-option EXT1 "VPN 127.0.0.1:443"
-http-proxy $IP 137">http-yd1-quanguo-1.ovpn
-echo 'remote wap.sx.10086.cn 80 tcp-client
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd1-quanguo-2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd1-quanguo-3.ovpn
-cat http-yd1-quanguo-1.ovpn http-yd1-quanguo-2.ovpn http-yd1-quanguo-3.ovpn>qyun-yd-sx2.ovpn
-
-
-echo "# 青云云免配置 云南移动2
-# 本文件由系统自动生成
-# 类型：HTTP转接
-management /data/data/de.blinkt.openvpn/cache/mgmtsocket unix
-management-client
-management-query-passwords
-management-hold
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-client
-verb 4
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-proto tcp
-dev tun
-http-proxy-option EXT1 "POST http://wap.yn.chinamobile.com/HTTP/1.1"
-http-proxy-option EXT1 "Host: wap.yn.chinamobile.com"
-http-proxy-option EXT1 "VPN 127.0.0.1:443"
-http-proxy $IP 137">http-yd1-quanguo-1.ovpn
-echo 'remote wap.yn.chinamobile.com 80 tcp-client
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd1-quanguo-2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd1-quanguo-3.ovpn
-cat http-yd1-quanguo-1.ovpn http-yd1-quanguo-2.ovpn http-yd1-quanguo-3.ovpn>qyun-yd-yn2.ovpn
-
-
-echo "# 青云云免配置 重庆移动2
-# 本文件由系统自动生成
-# 类型：HTTP转接
-management /data/data/de.blinkt.openvpn/cache/mgmtsocket unix
-management-client
-management-query-passwords
-management-hold
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-client
-verb 4
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-proto tcp
-dev tun
-http-proxy-option EXT1 "POST http://wap.cq.chinamobile.com/HTTP/1.1"
-http-proxy-option EXT1 "Host: wap.cq.chinamobile.com"
-http-proxy-option EXT1 "VPN 127.0.0.1:443"
-http-proxy $IP 137">http-yd1-quanguo-1.ovpn
-echo 'remote wap.cq.chinamobile.com 3389 tcp-client
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd1-quanguo-2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd1-quanguo-3.ovpn
-cat http-yd1-quanguo-1.ovpn http-yd1-quanguo-2.ovpn http-yd1-quanguo-3.ovpn>qyun-yd-cq2.ovpn
-
-
-echo "# 青云云免配置 贵州移动
-# 本文件由系统自动生成
-# 类型：HTTP转接
-management /data/data/de.blinkt.openvpn/cache/mgmtsocket unix
-management-client
-management-query-passwords
-management-hold
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-client
-verb 4
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-proto tcp
-dev tun
-http-proxy-option EXT1 "POST http://wap.gz.chinamobile.com/HTTP/1.1"
-http-proxy-option EXT1 "Host: wap.gz.chinamobile.com"
-http-proxy-option EXT1 "VPN 127.0.0.1:443"
-http-proxy $IP 137">http-yd1-quanguo-1.ovpn
-echo 'remote wap.gz.chinamobile.com 80 tcp-client
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd1-quanguo-2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd1-quanguo-3.ovpn
-cat http-yd1-quanguo-1.ovpn http-yd1-quanguo-2.ovpn http-yd1-quanguo-3.ovpn>qyun-yd-guiz.ovpn
-
-
-echo "# 青云云免配置 安徽移动
-# 本文件由系统自动生成
-# 类型：HTTP转接
-management /data/data/de.blinkt.openvpn/cache/mgmtsocket unix
-management-client
-management-query-passwords
-management-hold
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-client
-verb 4
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-proto tcp
-dev tun
-http-proxy-option EXT1 "POST http://service.ah.10086.cn/HTTP/1.1"
-http-proxy-option EXT1 "Host: service.ah.10086.cn"
-http-proxy-option EXT1 "VPN 127.0.0.1:443"
-http-proxy $IP 137">http-yd1-quanguo-1.ovpn
-echo 'remote service.ah.10086.cn 80 tcp-client
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd1-quanguo-2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd1-quanguo-3.ovpn
-cat http-yd1-quanguo-1.ovpn http-yd1-quanguo-2.ovpn http-yd1-quanguo-3.ovpn>qyun-yd-ah.ovpn
-
-echo "# 青云云免配置 北京移动
-# 本文件由系统自动生成
-# 类型：HTTP转接
-management /data/data/de.blinkt.openvpn/cache/mgmtsocket unix
-management-client
-management-query-passwords
-management-hold
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-client
-verb 4
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-proto tcp
-dev tun
-http-proxy-option EXT1 "POST http://wap.bj.chinamobile.com/HTTP/1.1"
-http-proxy-option EXT1 "Host: wap.bj.chinamobile.com"
-http-proxy-option EXT1 "VPN 127.0.0.1:443"
-http-proxy $IP 137">http-yd1-quanguo-1.ovpn
-echo 'remote wap.bj.chinamobile.com 3389 tcp-client
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd1-quanguo-2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd1-quanguo-3.ovpn
-cat http-yd1-quanguo-1.ovpn http-yd1-quanguo-2.ovpn http-yd1-quanguo-3.ovpn>qyun-yd-bj.ovpn
-
-echo "# 青云云免配置 福建移动
-# 本文件由系统自动生成
-# 类型：HTTP转接
-management /data/data/de.blinkt.openvpn/cache/mgmtsocket unix
-management-client
-management-query-passwords
-management-hold
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-client
-verb 4
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-proto tcp
-dev tun
-http-proxy-option EXT1 "POST http://wap.fj.chinamobile.com/HTTP/1.1"
-http-proxy-option EXT1 "Host: wap.fj.chinamobile.com"
-http-proxy-option EXT1 "VPN 127.0.0.1:443"
-http-proxy $IP 137">http-yd1-quanguo-1.ovpn
-echo 'remote wap.fj.chinamobile.com 80 tcp-client
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd1-quanguo-2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd1-quanguo-3.ovpn
-cat http-yd1-quanguo-1.ovpn http-yd1-quanguo-2.ovpn http-yd1-quanguo-3.ovpn>qyun-yd-fj.ovpn
-
-echo "# 青云云免配置 河北移动2
-# 本文件由系统自动生成
-# 类型：HTTP转接
-management /data/data/de.blinkt.openvpn/cache/mgmtsocket unix
-management-client
-management-query-passwords
-management-hold
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-client
-verb 4
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-proto tcp
-dev tun
-remote wap.ha.chinamobile.com 80 tcp-client
-http-proxy $IP 137">http-yd1-quanguo-1.ovpn
-echo 'http-proxy-option EXT1 qyunl 127.0.0.1:443
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd1-quanguo-2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd1-quanguo-3.ovpn
-cat http-yd1-quanguo-1.ovpn http-yd1-quanguo-2.ovpn http-yd1-quanguo-3.ovpn>qyun-yd-hebei2.ovpn
-
-
-echo "# 青云云免配置 河南移动2
-# 本文件由系统自动生成
-# 类型：HTTP转接
-management /data/data/de.blinkt.openvpn/cache/mgmtsocket unix
-management-client
-management-query-passwords
-management-hold
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-client
-verb 4
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-proto tcp
-dev tun
-http-proxy-option EXT1 "POST http://wap.ha.chinamobile.com/HTTP/1.1"
-http-proxy-option EXT1 "Host: wap.ha.chinamobile.com"
-http-proxy-option EXT1 "VPN 127.0.0.1:443"
-http-proxy $IP 137">http-yd1-quanguo-1.ovpn
-echo 'remote wap.ha.chinamobile.com 80 tcp-client
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd1-quanguo-2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd1-quanguo-3.ovpn
-cat http-yd1-quanguo-1.ovpn http-yd1-quanguo-2.ovpn http-yd1-quanguo-3.ovpn>qyun-yd-henan2.ovpn
-
-
-echo "# 青云云免配置 湖北移动
-# 本文件由系统自动生成
-# 类型：HTTP转接
-management /data/data/de.blinkt.openvpn/cache/mgmtsocket unix
-management-client
-management-query-passwords
-management-hold
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-client
-verb 4
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-proto tcp
-dev tun
-http-proxy-option EXT1 "POST http://wap.hb.10086.cn/HTTP/1.1"
-http-proxy-option EXT1 "Host: wap.hb.10086.cn"
-http-proxy-option EXT1 "VPN 127.0.0.1:443"
-http-proxy $IP 137">http-yd1-quanguo-1.ovpn
-echo 'remote wap.hb.10086.cn 3389 tcp-client
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd1-quanguo-2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd1-quanguo-3.ovpn
-cat http-yd1-quanguo-1.ovpn http-yd1-quanguo-2.ovpn http-yd1-quanguo-3.ovpn>qyun-yd-hubei.ovpn
-
-echo "# 青云云免配置 湖南移动2
-# 本文件由系统自动生成
-# 类型：HTTP转接
-management /data/data/de.blinkt.openvpn/cache/mgmtsocket unix
-management-client
-management-query-passwords
-management-hold
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-client
-verb 4
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-proto tcp
-dev tun
-http-proxy-option EXT1 "POST http://wap.hn.chinamobile.com/HTTP/1.1"
-http-proxy-option EXT1 "Host: wap.hn.chinamobile.com"
-http-proxy-option EXT1 "VPN 127.0.0.1:443"
-http-proxy $IP 137">http-yd1-quanguo-1.ovpn
-echo 'remote wap.hn.chinamobile.com 3389 tcp-client
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-yd1-quanguo-2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-yd1-quanguo-3.ovpn
-cat http-yd1-quanguo-1.ovpn http-yd1-quanguo-2.ovpn http-yd1-quanguo-3.ovpn>qyun-yd-hunan2.ovpn
-
-Referer='Referer: http://uac.10010.com/oauth2/new_auth?display=wap&page_type=05&app_code=ECS-YH-WAP&redirect_uri=http://wap.10010.com/t/loginCallBack.htm&state=http://wap.10010.com/t/home.htm&channel_code=113000001&real_ip='$IP;
-
-echo "# 青云云免配置 全国联通1
-# 本文件由系统自动生成
-# 类型：HTTP转接
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17"  
-machine-readable-output
-client
-dev tun
-proto tcp
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-http-proxy 10.0.0.172 80
-remote uac.10010.com/index.asp&from=http://$IP:440?uac.10010.com/index.asp&from=uac.10155.com/index.asp&& 440
-http-proxy-option EXT1 "POST http://m.client.10010.com"
-http-proxy-option EXT1 "GET http://m.client.10010.com"
-http-proxy-option EXT1 ": http://uac.10010.com/"
-http-proxy-option EXT1 "$Referer" 
-resolv-retry infinite">http-lt-quanguo-1.ovpn
-echo '
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-lt-quanguo-2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-lt-quanguo-3.ovpn
-cat http-lt-quanguo-1.ovpn http-lt-quanguo-2.ovpn http-lt-quanguo-3.ovpn>qyun-lt-qg1.ovpn
-
-
-echo "# 青云云免配置 全国联通2 广东已测试
-# 本文件由系统自动生成
-# 类型：HTTP转接
-client
-dev tun
-proto tcp
-keepalive 10 120
-ns-cert-type server
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-########免流代码########
-remote m.client.10010.com 3389 tcp-client
-http-proxy-option EXT1 "POST http://m.client.10010.com"
-http-proxy-option EXT1 qyunl 127.0.0.1:$vpnport
-http-proxy-option EXT1 "Host: m.client.10010.com / HTTP/1.1"
-http-proxy $IP 8080">http-lt-quanguo-1.ovpn
-echo '
-########免流代码########
-<http-proxy-user-pass>
-qyun
-qyun
-</http-proxy-user-pass>
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17"
-push route 114.114.114.144 114.114.115.115
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-auth-user-pass
-ns-cert-type server
-comp-lzo
-verb 3
-'>http-lt-quanguo-2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-lt-quanguo-3.ovpn
-cat http-lt-quanguo-1.ovpn http-lt-quanguo-2.ovpn http-lt-quanguo-3.ovpn>qyun-lt-qg2.ovpn
-
-
-echo "# 青云云免配置 广东联通
-# 本文件由系统自动生成
-# 类型：HTTP转接
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-client
-dev tun
-proto tcp
-
-remote u.3gtv.net 80
-http-proxy-option EXT1 "VPN"
-http-proxy $IP 8080">http-lt-quanguo-1.ovpn
-echo '
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-lt-quanguo-2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-lt-quanguo-3.ovpn
-cat http-lt-quanguo-1.ovpn http-lt-quanguo-2.ovpn http-lt-quanguo-3.ovpn>qyun-lt-gd.ovpn
-
-
-echo "# 青云云免配置 UAC联通1 重庆已测试
-# 本文件由系统自动生成
-# 类型：HTTP转接
-client
-dev tun
-proto tcp
-remote uac.10010.com $vpnport
-########免流代码########
-http-proxy $IP 8080">http-lt-uac-1.ovpn
-echo 'http-proxy-option EXT1 "POST http://k.10010.com"
-http-proxy-option EXT1 "Host k.10010.com"
-http-proxy-option EXT1 "Host: k.10010.com / HTTP/1.1"
-########免流代码########
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17"
-push route 114.114.114.114 114.114.115.115
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-auth-user-pass
-ns-cert-type server
-comp-lzo
-verb 3
-'>http-lt-uac-2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-lt-uac-3.ovpn
-cat http-lt-uac-1.ovpn http-lt-uac-2.ovpn http-lt-uac-3.ovpn>qyun-lt-uac1.ovpn
-
-
-echo "# 青云云免配置 UAC联通2
-# 本文件由系统自动生成
-# 类型：常规类型
-client
-dev tun
-proto tcp
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-########免流代码########
-remote $IP 80
-http-proxy $IP $mpport
-http-proxy-option EXT1 qyunl 127.0.0.1:$vpnport">http-lt-uac-1.ovpn
-echo 'http-proxy-option EXT1 "POST http://rd.go.10086.cn"
-http-proxy-option EXT1 "GET http://uac.10010.com"
-http-proxy-option EXT1 "X-Online-Host: uac.10010.com"
-http-proxy-option EXT1 "POST http://uac.10010.com"
-http-proxy-option EXT1 "X-Online-Host: uac.10010.com"
-http-proxy-option EXT1 "POST http://uac.10010.com"
-http-proxy-option EXT1 "Host: uac.10010.com"
-http-proxy-option EXT1 "GET http://uac.10010.com"
-http-proxy-option EXT1 "Host: uac.10010.com"
-http-proxy-option EXT1 "Referer: http://uac.10010.com/oauth2/new_ ... 0001&real_ip=222.186.50.69"
-########免流代码########
-<http-proxy-user-pass>
-qyun
-qyun
-</http-proxy-user-pass>
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17"
-push route 114.114.114.144 114.114.115.115
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-auth-user-pass
-ns-cert-type server
-comp-lzo
-verb 3
-'>http-lt-uac-2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-lt-uac-3.ovpn
-cat http-lt-uac-1.ovpn http-lt-uac-2.ovpn http-lt-uac-3.ovpn>qyun-lt-uac2.ovpn
-
-
-
-echo "# 青云云免配置 联通特殊线路
-# 本文件由系统自动生成
-# 类型：HTTP转接
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-client
-dev tun
-proto tcp
-
-remote mob.10010.com 443
-http-proxy-option EXT1 "VPN"
-http-proxy $IP 186">http-lt-ts-1.ovpn
-echo '########免流代码########
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-lt-ts-2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-lt-ts-3.ovpn
-cat http-lt-ts-1.ovpn http-lt-ts-2.ovpn http-lt-ts-3.ovpn>qyun-lt-ts.ovpn
-
-
-echo "# 青云云免配置 联通空中卡53
-# 本文件由系统自动生成
-# 类型：HTTP转接
-client
-dev tun
-proto tcp
-remote k.10010.com 80
-########免流代码########
-http-proxy $IP 53">http-lt-53-1.ovpn
-echo 'http-proxy-option EXT1 "POST http://k.10010.com"
-http-proxy-option EXT1 "Host k.10010.com"
-http-proxy-option EXT1 "Host: k.10010.com / HTTP/1.1"
-########免流代码########
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17"
-push route 114.114.114.114 114.114.115.115
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-auth-user-pass
-ns-cert-type server
-comp-lzo
-verb 3
-'>http-lt-53-2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-lt-53-3.ovpn
-cat http-lt-53-1.ovpn http-lt-53-2.ovpn http-lt-53-3.ovpn>qyun-lt-53.ovpn
-
-
-
-echo "# 青云云免配置 全国联通3  广东亲测0扣
-# 本文件由系统自动生成
-# 类型：3-HTTP转接类型
-client
-dev tun
-proto tcp
-keepalive 10 120
-ns-cert-type server
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-########免流代码########
-remote m.client.10010.com 3389 tcp-client">http-lt-quanguo1-1.ovpn
-echo 'http-proxy-option EXT1 "POST http://m.client.10010.com"
-http-proxy-option EXT1 qyunl 127.0.0.1:$vpnport
-http-proxy-option EXT1 "Host: m.client.10010.com / HTTP/1.1"
-http-proxy $IP 8080
-########免流代码########
-<http-proxy-user-pass>
-qyun
-qyun
-</http-proxy-user-pass>
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17"
-push route 114.114.114.144 114.114.115.115
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-auth-user-pass
-ns-cert-type server
-comp-lzo
-verb 3
-'>http-lt-quanguo1-2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-lt-quanguo1-3.ovpn
-cat http-lt-quanguo1-1.ovpn http-lt-quanguo1-2.ovpn http-lt-quanguo1-3.ovpn>qyun-lt-qg3.ovpn
-
-
-echo "# 青云云免配置 联通大王卡
-# 本文件由系统自动生成
-# 类型：HTTP转接
-client
-dev tun
-proto tcp
-remote mob.10010.com 80
-########免流代码########
-http-proxy $IP $mpport
-http-proxy-option EXT1 qyunl 127.0.0.1:$vpnport">http-lt-quanguo-1.ovpn
-echo '
-http-proxy-option EXT1 "POST http://mp.weixin.qq.com"
-http-proxy-option EXT1 "Host: http://mp.weixin.qq.com / HTTP/1.1"
-########免流代码########
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17"
-push route 114.114.114.114 114.114.115.115
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-auth-user-pass
-ns-cert-type server
-comp-lzo
-verb 3
-'>http-lt-quanguo-2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-lt-quanguo-3.ovpn
-cat http-lt-quanguo-1.ovpn http-lt-quanguo-2.ovpn http-lt-quanguo-3.ovpn>qyun-new-dwk.ovpn
-
-echo "# 青云云免配置 电信爱看
-# 本文件由系统自动生成
-# 类型：HTTP转接
-client
-dev tun
-proto tcp
-remote ltetptv.189.com 80
-########免流代码########
-http-proxy $IP $mpport
-http-proxy-option EXT1 qyunl 127.0.0.1:$vpnport">http-dx-1.ovpn
-echo 'http-proxy-option EXT1 "POST http://dl.music.189.cn / HTTP/1.1"
-http-proxy-option EXT1 "Host: ltetptv.189.com"
-########免流代码########
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17"
-push route 114.114.114.114 114.114.115.115
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-auth-user-pass
-ns-cert-type server
-comp-lzo
-verb 3
-'>http-dx-2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-dx-3.ovpn
-cat http-dx-1.ovpn http-dx-2.ovpn http-dx-3.ovpn>qyun-dx-ak.ovpn
-
-echo "# 青云云免配置 广西电信
-# 本文件由系统自动生成
-# 类型：HTTP转接
-setenv IV_GUI_VER de.blinkt.openvpn 0.6.17 
-machine-readable-output
-client
-dev tun
-proto tcp
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-########免流代码########
-http-proxy-option EXT1 "qyunl 127.0.0.1:443"
-remote www.baidu.com/ltetp.tv189.com/ 443
-http-proxy $IP 8080">http-dx-1.ovpn
-echo '########免流代码########
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-dx-2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-dx-3.ovpn
-cat http-dx-1.ovpn http-dx-2.ovpn http-dx-3.ovpn>qyun-dx-gx.ovpn
-
-
-echo "# 青云云免配置 全国电信爱玩
-# 本文件由系统自动生成
-# 类型：HTTP转接
-client
-dev tun
-proto tcp
-remote cdn.4g.play.cn 80
-########免流代码########
-http-proxy $IP $mpport
-http-proxy-option EXT1 qyunl 127.0.0.1:$vpnport">http-dx-1.ovpn
-echo 'http-proxy-option EXT1 "POST http://cdn.4g.play.cn/ HTTP/1.1"
-http-proxy-option EXT1 "Host: cdn.4g.play.cn" 
-########免流代码########
-resolv-retry infinite
-nobind
-persist-key
-persist-tun
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17"
-push route 114.114.114.114 114.114.115.115
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-auth-user-pass
-ns-cert-type server
-comp-lzo
-verb 3
-'>http-dx-2.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-dx-3.ovpn
-cat http-dx-1.ovpn http-dx-2.ovpn http-dx-3.ovpn>qyun-dx-aw.ovpn
-
-
-echo '# 青云云免配置 全国电信
-# 本文件由系统自动生成
-setenv IV_GUI_VER "de.blinkt.openvpn 0.6.17" 
-machine-readable-output
-connect-retry-max 5
-connect-retry 5
-resolv-retry 60
-client
-dev tun
-proto tcp
-remote dl.music.189.cn 80 tcp-client
-http-proxy-option EXT1 "GET http://dl.music.189.cn:9495/res/V/1388/mp3/33/58/94/1388335894003000.mp3?mb=15380197563&fs=10104163&s=800&n=&id=63696337&M=online&sid=240387514 HTTP/1.1"
-http-proxy-option EXT1 "Host dl.music.189.cn:9495"
-http-proxy-option EXT1 "POST http://iting.music.189.cn:9101/iting2/imusic/V2 HTTP/1.1"
-http-proxy-option EXT1 "VPN"'>http-dx-1.ovpn
-echo "http-proxy $IP 8080">http-dx-2.ovpn
-echo 'resolv-retry infinite
-nobind
-persist-key
-persist-tun
-auth-user-pass
-ns-cert-type server
-redirect-gateway
-keepalive 20 60
-comp-lzo
-verb 3
-'>http-dx-3.ovpn
-echo "## 证书
-<ca>
-`cat ca.crt`
-</ca>
-key-direction 1
-<tls-auth>
-`cat ta.key`
-</tls-auth>
-">http-dx-4.ovpn
-cat http-dx-1.ovpn http-dx-2.ovpn http-dx-3.ovpn http-dx-4.ovpn>qyun-dx-qg.ovpn
-
-
-echo
-echo "配置文件制作完毕"
-cd /home
-wget ${https}${hostfile}/apktool.jar >/dev/null 2>&1
-wget ${https}${hostfile}/signer.tar.gz >/dev/null 2>&1
-echo
-echo -e "\033[35m正在生成Android应用...\033[0m"
-if [ ! -e "/usr/bin/java" ];
-then
-yum install -y java >/dev/null 2>&1
-fi
-cd /home
-yum install -y libstdc++.i686 glibc.i686 zlib.i686 --setopt=protected_multilib=false >/dev/null 2>&1
-mkdir android
-chmod 777 -R /home/android
-cp /home/apktool.jar /home/android/ >/dev/null 2>&1
-cd /home/android
-wget ${https}${hostfile}/qyun.apk >/dev/null 2>&1
-if [ ! -f "/home/android/apktool.jar" ]; then
-	wget ${https}${hostfile}/apktool.jar >/dev/null 2>&1
-fi
-if [ ! -f "/home/android/qyun.apk" ]; then
-	wget ${https}${hostfile}/qyun.apk >/dev/null 2>&1
-fi
-sleep 1
-java -jar apktool.jar d qyun.apk
-sed -i 's/www.qyunl.com/'${IP}:${port}'/g' /home/android/qyun/smali/net/openvpn/openvpn/AutoScrollTextView.smali >/dev/null 2>&1
-sed -i 's/www.qyunl.com/'${IP}:${port}'/g' /home/android/qyun/smali/net/openvpn/openvpn/ChongzhiActivity.smali >/dev/null 2>&1
-sed -i 's/www.qyunl.com/'${IP}:${port}'/g' '/home/android/qyun/smali/net/openvpn/openvpn/DoActivity$3.smali' >/dev/null 2>&1
-sed -i 's/www.qyunl.com/'${IP}:${port}'/g' '/home/android/qyun/smali/com/mayor/prg/mst$2.smali' >/dev/null 2>&1
-sed -i 's/www.qyunl.com/'${IP}:${port}'/g' /home/android/qyun/smali/net/openvpn/openvpn/MainActivity.smali >/dev/null 2>&1
-sed -i 's/www.qyunl.com/'${IP}:${port}'/g' /home/android/qyun/smali/net/openvpn/openvpn/MainTabActivity.smali >/dev/null 2>&1
-sed -i 's/www.qyunl.com/'${IP}:${port}'/g' /home/android/qyun/smali/net/openvpn/openvpn/OpenVPNClient.smali >/dev/null 2>&1
-sed -i 's/qyunrdkey/'$appkey'/g' '/home/android/qyun/smali/com/mayor/prg/mst$2.smali' >/dev/null 2>&1
-sed -i 's/qyunrdkey/'$appkey'/g' /home/android/qyun/smali/net/openvpn/openvpn/ChongzhiActivity.smali >/dev/null 2>&1
-sed -i 's/qyunrdkey/'$appkey'/g' '/home/android/qyun/smali/net/openvpn/openvpn/DoActivity$3.smali' >/dev/null 2>&1
-sed -i 's/qyunrdkey/'$appkey'/g' /home/android/qyun/smali/net/openvpn/openvpn/MainActivity.smali >/dev/null 2>&1
-sed -i 's/qyunrdkey/'$appkey'/g' /home/android/qyun/smali/net/openvpn/openvpn/MainTabActivity.smali >/dev/null 2>&1
-sed -i 's/qyunrdkey/'$appkey'/g' /home/android/qyun/smali/net/openvpn/openvpn/OpenVPNClient.smali >/dev/null 2>&1
-sed -i 's/青云云流量/'$appname'/g' /home/android/qyun/res/values/strings.xml >/dev/null 2>&1
-sed -i 's/100340768/'$appqq'/g' /home/android/qyun/res/values/strings.xml >/dev/null 2>&1
-sleep 1
-sudo chmod +x /home/android/apktool.jar
-java -jar apktool.jar b qyun >/dev/null 2>&1
-cp /home/signer.tar.gz /home/android/qyun/dist/ >/dev/null 2>&1
-cd /home/android/qyun/dist
-if [ ! -f "/home/android/qyun/dist/signer.tar.gz" ]; then
-	wget ${https}${hostfile}/signer.tar.gz >/dev/null 2>&1
-fi
-tar zxf signer.tar.gz
-java -jar signapk.jar testkey.x509.pem testkey.pk8 qyun.apk qyunml.apk
-\cp -rf /home/android/qyun/dist/qyunml.apk /home/qyun.apk
-rm -rf /home/android >/dev/null 2>&1
-echo
-if [ ! -e "/home/qyun.apk" ];then
-echo -e "\033[31m检测到APP名字为乱码，所以APP没有生成成功。请安装完后执行脚本使用代理APP生成。\033[0m"
-else
-echo -e "\033[31m青云APP生成成功\033[0m"
-fi
-sleep 3
-if [[ "$llwsinstall" == "1" ]];then
-echo
-echo -e "\033[35m正在生成流量卫士5.1应用...\033[0m"
-cd /home
-mkdir android
-chmod 777 -R /home/android
-cp /home/apktool.jar /home/android/ >/dev/null 2>&1
-cd /home/android
-wget ${https}${hostfile}/llws.apk >/dev/null 2>&1
-if [ ! -f "/home/android/apktool.jar" ]; then
-    wget ${https}${hostfile}/apktool.jar >/dev/null 2>&1
-fi
-if [ ! -f "/home/android/llws.apk" ]; then
-	wget ${https}${hostfile}/llws.apk >/dev/null 2>&1
-fi
-java -jar apktool.jar d llws.apk
-sed -i 's/www.qyunl.com/'${IP}:${port}'/g' /home/android/llws/smali/net/openvpn/openvpn/base.smali >/dev/null 2>&1
-sed -i 's/0542fa6e2f2de6bb5f3a7813ded625ab/'$llwsmd5'/g' /home/android/llws/smali/net/openvpn/openvpn/base.smali >/dev/null 2>&1
-sed -i 's/www.qyunl.com/'${IP}:${port}'/g' '/home/android/llws/smali/net/openvpn/openvpn/Main2Activity$MyListener$1.smali' >/dev/null 2>&1
-sed -i 's/www.qyunl.com/'${IP}:${port}'/g' '/home/android/llws/smali/net/openvpn/openvpn/Main2Activity$MyListener.smali' >/dev/null 2>&1
-sed -i 's/www.qyunl.com/'${IP}:${port}'/g' /home/android/llws/smali/net/openvpn/openvpn/MainActivity.smali >/dev/null 2>&1
-sed -i 's/www.qyunl.com/'${IP}:${port}'/g' '/home/android/llws/smali/net/openvpn/openvpn/OpenVPNClient$10.smali' >/dev/null 2>&1
-sed -i 's/www.qyunl.com/'${IP}:${port}'/g' '/home/android/llws/smali/net/openvpn/openvpn/OpenVPNClient$11.smali' >/dev/null 2>&1
-sed -i 's/www.qyunl.com/'${IP}:${port}'/g' '/home/android/llws/smali/net/openvpn/openvpn/OpenVPNClient$13.smali' >/dev/null 2>&1
-sed -i 's/www.qyunl.com/'${IP}:${port}'/g' /home/android/llws/smali/net/openvpn/openvpn/OpenVPNClient.smali >/dev/null 2>&1
-sed -i 's/www.qyunl.com/'${IP}:${port}'/g' '/home/android/llws/smali/net/openvpn/openvpn/splash$1$1.smali' >/dev/null 2>&1
-sed -i 's/www.qyunl.com/'${IP}:${port}'/g' '/home/android/llws/smali/net/openvpn/openvpn/splash$2.smali' >/dev/null 2>&1
-sed -i 's/www.qyunl.com/'${IP}:${port}'/g' '/home/android/llws/smali/net/openvpn/openvpn/update$myClick$1.smali' >/dev/null 2>&1
-sed -i 's/青云流量卫士/'$llwsname'/g' /home/android/llws/res/values/strings.xml >/dev/null 2>&1
-sudo chmod +x /home/android/apktool.jar
-java -jar apktool.jar b llws >/dev/null 2>&1
-cp /home/signer.tar.gz /home/android/llws/dist/ >/dev/null 2>&1
-cd /home/android/llws/dist
-if [ ! -f "/home/android/qyun/dist/signer.tar.gz" ]; then
-    wget ${https}${hostfile}/signer.tar.gz >/dev/null 2>&1
-fi
-tar zxf signer.tar.gz
-java -jar signapk.jar testkey.x509.pem testkey.pk8 llws.apk llwsml.apk
-\cp -rf /home/android/llws/dist/llwsml.apk /home/llws.apk
-echo
-if [ ! -e "/home/llws.apk" ];then
-echo -e "\033[31m检测到流量卫士名字为乱码，所以APP没有生成成功。\033[0m"
-else
-echo -e "\033[31m青云流量卫士5.1生成成功\033[0m"
-fi
-cd /home/wwwroot/default/
-wget ${https}${hostfile}/${llwswebfile} >/dev/null 2>&1
-unzip -q ${llwswebfile} >/dev/null 2>&1
-chmod 777 -R /home/wwwroot/default/ >/dev/null 2>&1
-rm -rf ${llwswebfile} >/dev/null 2>&1
-sed -i 's/qysql/'$sqlpass'/g' /home/wwwroot/default/app_api/config.php >/dev/null 2>&1
-sed -i 's/0542fa6e2f2de6bb5f3a7813ded625ab/'$llwsmd5'/g' /home/wwwroot/default/app_api/licences.key >/dev/null 2>&1
-mv /home/wwwroot/default/app_api/top_api.php /home/wwwroot/default/app_api/${llwskey}.php >/dev/null 2>&1
-chmod 777 -R /home/wwwroot/default/app_api/ >/dev/null 2>&1
-cd /home
-tar -zcvf ${uploadfile} ./{qyun-yd-udp53.ovpn,qyun-yd-udp137.ovpn,qyun-yd-udp138.ovpn,qyun-yd-sh.ovpn,qyun-yd-qg1.ovpn,qyun-yd-qg2.ovpn,qyun-yd-sc.ovpn,qyun-yd-gd.ovpn,qyun-yd-cq.ovpn,qyun-yd-zj.ovpn,qyun-yd-yn.ovpn,qyun-yd-sz.ovpn,qyun-yd-st.ovpn,qyun-yd-sx.ovpn,qyun-yd-sd.ovpn,qyun-yd-ln.ovpn,qyun-yd-jl.ovpn,qyun-yd-hunan.ovpn,qyun-yd-henan.ovpn,qyun-yd-hebei.ovpn,qyun-yd-guangzhou.ovpn,qyun-yd-guangxi.ovpn,qyun-yd-jiangxi.ovpn,qyun-yd-gansu.ovpn,qyun-yd-maom.ovpn,qyun-yd-guiz.ovpn,qyun-yd-ah.ovpn,qyun-yd-bj.ovpn,qyun-yd-fj.ovpn,qyun-yd-hubei.ovpn,qyun-yd-ln2.ovpn,qyun-yd-sd2.ovpn,qyun-yd-sx2.ovpn,qyun-yd-yn2.ovpn,qyun-yd-cq2.ovpn,qyun-yd-hebei2.ovpn,qyun-yd-hunan2.ovpn,qyun-lt-qg1.ovpn,qyun-lt-qg2.ovpn,qyun-lt-qg3.ovpn,qyun-lt-gd.ovpn,qyun-lt-uac1.ovpn,qyun-lt-uac2.ovpn,qyun-lt-ts.ovpn,qyun-new-dwk.ovpn,qyun-dx-ak.ovpn,qyun-dx-gx.ovpn,qyun-dx-aw.ovpn,qyun-dx-qg.ovpn,qyun-lt-53.ovpn,qyun-yd-henan2.ovpn,llws.apk,qyun.apk,ca.crt,ta.key} >/dev/null 2>&1
-
-
-else
-mysql -hlocalhost -uroot -p$sqlpass ov -e "drop table app_admin" >/dev/null 2>&1
-mysql -hlocalhost -uroot -p$sqlpass ov -e "drop table app_bbs" >/dev/null 2>&1
-mysql -hlocalhost -uroot -p$sqlpass ov -e "drop table app_config" >/dev/null 2>&1
-mysql -hlocalhost -uroot -p$sqlpass ov -e "drop table app_daili" >/dev/null 2>&1
-mysql -hlocalhost -uroot -p$sqlpass ov -e "drop table app_data" >/dev/null 2>&1
-mysql -hlocalhost -uroot -p$sqlpass ov -e "drop table app_gg" >/dev/null 2>&1
-mysql -hlocalhost -uroot -p$sqlpass ov -e "drop table app_qq" >/dev/null 2>&1
-mysql -hlocalhost -uroot -p$sqlpass ov -e "drop table app_read" >/dev/null 2>&1
-mysql -hlocalhost -uroot -p$sqlpass ov -e "drop table line" >/dev/null 2>&1
-mysql -hlocalhost -uroot -p$sqlpass ov -e "drop table line_grop" >/dev/null 2>&1
-mysql -hlocalhost -uroot -p$sqlpass ov -e "drop table top" >/dev/null 2>&1
-cd /home
-tar -zcvf ${uploadfile} ./{qyun-yd-udp53.ovpn,qyun-yd-udp137.ovpn,qyun-yd-udp138.ovpn,qyun-yd-sh.ovpn,qyun-yd-qg1.ovpn,qyun-yd-qg2.ovpn,qyun-yd-sc.ovpn,qyun-yd-gd.ovpn,qyun-yd-cq.ovpn,qyun-yd-zj.ovpn,qyun-yd-yn.ovpn,qyun-yd-sz.ovpn,qyun-yd-st.ovpn,qyun-yd-sx.ovpn,qyun-yd-sd.ovpn,qyun-yd-ln.ovpn,qyun-yd-jl.ovpn,qyun-yd-hunan.ovpn,qyun-yd-henan.ovpn,qyun-yd-hebei.ovpn,qyun-yd-guangzhou.ovpn,qyun-yd-guangxi.ovpn,qyun-yd-jiangxi.ovpn,qyun-yd-gansu.ovpn,qyun-yd-maom.ovpn,qyun-yd-guiz.ovpn,qyun-yd-ah.ovpn,qyun-yd-bj.ovpn,qyun-yd-fj.ovpn,qyun-yd-hubei.ovpn,qyun-yd-ln2.ovpn,qyun-yd-sd2.ovpn,qyun-yd-sx2.ovpn,qyun-yd-yn2.ovpn,qyun-yd-cq2.ovpn,qyun-yd-hebei2.ovpn,qyun-yd-hunan2.ovpn,qyun-lt-qg1.ovpn,qyun-lt-qg2.ovpn,qyun-lt-qg3.ovpn,qyun-lt-gd.ovpn,qyun-lt-uac1.ovpn,qyun-lt-uac2.ovpn,qyun-lt-ts.ovpn,qyun-new-dwk.ovpn,qyun-dx-ak.ovpn,qyun-dx-gx.ovpn,qyun-dx-aw.ovpn,qyun-dx-qg.ovpn,qyun-lt-53.ovpn,qyun-yd-henan2.ovpn,qyun.apk,ca.crt,ta.key} >/dev/null 2>&1
-fi
-
-
-
-echo
-echo "正在上传文件中..."
-echo "温馨提示："
-echo "上传需要几分钟具体时间看你服务器配置"
-echo "再此期间请耐心等待！"
-echo
-curl --upload-file ./${uploadfile} ${http}${upload}/${uploadfile} >/dev/null 2>&1 >url
-echo
-echo "正在上传apk文件..."
+	mv -f /root/K/sha /bin/sha
+	mv -f /root/K/Ky /bin/Ky
+	mv -f /root/K/Kps /bin/Kps
+	mv -f /root/K/*.sh /etc/Kyun/
+	mv -f /root/K/bwlimitplugin.* /etc/Kyun/
+	mv -f /root/K/kyun.conf /etc/Kyun/kyun.conf
+	rm -rf /root/K
+	chmod 0777 -R /bin/Kps
+	chmod 0777 -R /bin/Ky
+	chmod 0777 -R /bin/sha
+	sed -i 's/SETPASS/'$sqlpass'/g' /etc/Kyun/kyun.conf
+	sed -i 's/SETWEB/'$webdk'/g' /etc/Kyun/kyun.conf
+	sed -i 's/SETIP/'$IP'/g' /etc/Kyun/kyun.conf
+	sed -i 's/SETWANG/'$wangka'/g' /etc/Kyun/kyun.conf
+	chmod 0777 -R /etc/Kyun/*
+	chmod 0777 -R /mnt/*
+	mv -f /mnt/* /Data/wwwroot/Kyun/
+	yum install -y crontabs >/dev/null 2>&1
+	mkdir -p /var/spool/cron
+	mkdir -p /Data/Backups
+	echo -e 'source /etc/Kyun/kyun.conf\nmysqldump -u$Kyun_USER -p$Kyun_PASS $Kyun_NAME > /Data/Backups/`date +%F`.sql' >> /Data/Backups/Backups.sh
+	rm -rf /etc/localtime
+	ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+	echo "00 05 *   * * /bin/bash /Data/Backups/Bckups.sh" >> /var/spool/cron/root
+	echo "*/10 * * * * ntpdate time.windows.com" >> /var/spool/cron/root
+	systemctl restart crond.service
+    systemctl start httpd.service
+    vpn >/dev/null 2>&1
+	chmod 0777 -R /Data/wwwroot/Kyun/Online/*
+	cd /Data/wwwroot/Kyun
+	wget -q ${web}$Host/$phpmyadmin
+	tar zxf $phpmyadmin && rm -f $phpmyadmin 
+	mv phpMyAdmin-4.4.15.5-all-languages $sql
+	echo && echo "正在检测vpn状态..."
+    op=`ps -ef |grep openvpn|grep -v grep |wc -l`
+    if [[ $op -ge '6' ]];then
+        echo && echo -e "VPN运行状态     [\033[32m OK \033[0m]"
+	elif [[ $op -ge '5' ]];then
+	    echo && echo -e "\033[31m错误，有一个VPN程序启动失败\033[0m\n"
+	    echo -e "\033[31m请检查你的服务器是否已占用udp68、udp53、tcp666、tcp1194、tcp443、tcp3389端口\033[0m"
+	    echo -e "\033[34m解决方法：搭建完成后重启一下服务器，如不行请重装系统再搭建\033[0m"
+		sleep 8
+	else 
+	    echo && echo -e "\033[31m错误，有一些VPN程序启动失败\033[0m\n"
+	    echo -e "\033[31m请检查你的服务器是否已占用udp68、udp53、tcp666、tcp1194、tcp443、tcp3389端口\033[0m"
+		echo -e "\033[34m解决方法：搭建完成后重启一下服务器，如不行请重装系统再搭建\033[0m"
+	    sleep 8
+    fi
+return 1
+}
+
+function KyunVPN() {
+echo && echo "开始安装VPN程序..."
+yum install -y openvpn telnet >/dev/null 2>&1
+yum install -y gcc openssl openssl-devel lzo lzo-devel pam pam-devel automake pkgconfig >/dev/null 2>&1
+wget -q ${web}$Host/$O
+rpm -Uvh --oldpackage --force $O >/dev/null 2>&1
+rm -rf $O && mkdir -p /etc/openvpn
+cd /root && wget -q ${web}$Host/$peizhi
+unzip -q $peizhi && rm -rf $peizhi
+mv -f /root/K/server-*.conf /etc/openvpn/
+chmod 0777 -R /etc/openvpn/*
+mkdir -p /etc/Kyun
+cd /etc/openvpn && wget -q ${web}$Host/$EasyRSA
+unzip -q $EasyRSA && rm -rf $EasyRSA
+chmod 0777 -R /etc/openvpn/easy-rsa/*
+rm -rf /bin/vpn
+mv -f /root/K/vpn /bin/vpn
+chmod 0777 -R /bin/vpn
+wget -q -O /bin/K666 ${web}$Host/K666
+chmod 0777 /bin/K666
+return 1
+}
+
+function Kyun() {
+Kyunhead
 clear
-rm -rf llws
-rm -rf android
-rm -rf *.ovpn
-sleep 3
-rm -rf /home/apktool.jar
-rm -rf /home/signer.tar.gz
-
-cd /home
-echo
-echo
-echo '欢迎使用青云OpenVPN快速安装脚本' >>info.txt
-echo "
----------------------------------------------------------
-前台/用户中心：http://${IP}:${port}
-后台管理系统： http://${IP}:${port}/admin
-代理中心：     http://${IP}:${port}/daili
-数据库后台：   http://${IP}:${port}/$phpmyadmin
-快速查询流量： http://${IP}:${port}/cx.php
-Ios线路安装地址:http://${IP}:${port}/user/ios.php
-流量卫士管理页面:http://${IP}:${port}/app_api/admin.php
----------------------------------------------------------
-
----------------------------------------------------------
-您的数据库用户名：root 数据库密码：${sqlpass}
-后台管理员用户名：$id 管理密码：$ml
-您设置的APP对接KEY为：${appkey}
-流量卫士管理账号：$llwsid 管理密码：$llwsmm
-APP加固地址：http://jaq.alibaba.com/
----------------------------------------------------------
-
----------------------------------------------------------
-前台WEB引导页目录:/home/wwwroot/default/web/
-前台用户中心目录:/home/wwwroot/default/user/
----------------------------------------------------------
-
-">>info.txt
-
-echo -e "\033[35m正在为您开启所有服务...\033[0m"
-chmod 777 /home/wwwroot/default/res/*
-chmod 777 /home/wwwroot/default/udp/*
-sleep 3
-chmod 0777 /usr/bin/udp
-udp -l $mpport -d >/dev/null 2>&1
-udp -l 135 -d >/dev/null 2>&1
-udp -l 136 -d >/dev/null 2>&1
-udp -l 137 -d >/dev/null 2>&1
-udp -l 138 -d >/dev/null 2>&1
-udp -l 139 -d >/dev/null 2>&1
-udp -l 53 -d >/dev/null 2>&1
-udp -l 3389 -d >/dev/null 2>&1
-udp -l 351 -d >/dev/null 2>&1
-udp -l 524 -d >/dev/null 2>&1
-udp -l 265 -d >/dev/null 2>&1
-udp -l 440 -d >/dev/null 2>&1
-udp -l 180 -d >/dev/null 2>&1
-udp -l 366 -d >/dev/null 2>&1
-sleep 5
-clear
-echo
-echo -e "\033[34m进行打包文件...\033[0m"
-echo
-sleep 2
-cd /home/
-clear
-rm -rf *.ovpn
-rm -rf /root/ShakaApktool
-echo -e "\033[34m进配置文件已经上传完毕！正在加载您的配置信息...\033[0m"
-cat info.txt
-echo -e "线路APP下载链接：http://${IP}:${port}/qyun-openvpn.tar.gz"
-echo 
-echo -n "线路APP备用下载链接："
-cat url
-\cp -rf /home/qyun-openvpn.tar.gz /home/wwwroot/default/qyun-openvpn.tar.gz
-echo
-echo -e "\033[31m您的IP是：$IP （如果与您实际IP不符合或空白，请自行修改.ovpn配置）\033[0m"
-rm -rf url >/dev/null 2>&1
-cd /home/wwwroot/default/
-rm -rf install.sql
-exit 0;
+if [[ $Ksq2 == *黑名单* ]];then
+  echo -e "\033[31m$HmdLogo\033[0m"
+  exit 1
 fi
-exit 0;
+echo -e "\033[36m$KyLogo\033[0m"
+echo
+echo -n -e "请输入博客地址：[\033[32m blog.67cc.cn\033[0m ]："
+read key
+if [[ $key == 'blog.67cc.cn' ]]
+then
+	echo
+	dizhi=`echo $localserver|awk '{print $3}'`
+	echo -e "验证成功，本机IP：\033[34m$IP $dizhi$fwq\033[0m"
+	sleep 1
+	echo
+else
+    clear
+    echo -e "\033[31m$YzError\033[0m"
+	exit 1
+fi
+sqlcnm='已授权'
+if [[ $sqlcnm == *已授权* ]];then
+	echo -e '\033[1;34m本机器已永久授权   高级模式：\033[32m[ 已开启 ]\033[0m'
+	sleep 1
+else
+	clear
+	echo -e "\033[36m$BuyLogo\033[0m";
+	echo
+	echo -n -e "\033[32m请输入授权码：\033[0m"
+	read user
+	echo
+	if [[ $sqlcnm == *已授权* ]];then
+		echo -e '\033[1;34mIP状态：            \033[32m[  OK  ]\033[0m'
+		sleep 0.5 && echo
+		echo -e '\033[1;34m密匙正确！    高级模式：\033[32m[ 已开启 ]\033[0m'
+		sleep 1 && echo
+		echo -e '\033[1;34m此授权码已成功绑定您的机器，可永久重复无限搭建\033[0m';
+		sleep 1
+	else
+		echo -e '\033[1;34m MD\033[31mZZ\033[0m'
+		exit 1
+	fi
+fi
+clear
+echo "请选择要安装的类型："
+echo 
+echo -e "1 - \033[36m全新流控\033[0m >> 安装最新版本 N17-6.4"
+echo -e "2 - \033[36m一键负载\033[0m >> 一键N台服务器共用账号"
+echo -e "3 - \033[36m备份数据\033[0m >> 方便重新搭建恢复数据"
+echo -e "4 - \033[36mAPP生成\033[0m >> 一键生成代理独立专属APP"
+echo -e "5 - \033[36m在线升级\033[0m >> 更新到快云流控最新版"
+echo -e "6 - \033[36m卸载流控\033[0m >> 清空本机已安装的文件"
+echo
+echo -n "输入选项: "
+read install 
+if [[ $install == 2 ]];then
+  clear
+  echo -e -n "\033[34m请输入主机IP：\033[0m"
+  read zhuip
+if [[ "$zhuip" == '' ]]; then
+  echo
+  echo -e -n '输入的内容不能为空白，请重新输入：'
+  read zhuip
+fi
+echo
+echo -e -n "\033[34m回车开始搞事\033[0m"
+read
+echo && echo -e  "正在进行一键负载..."
+sed -i "s/localhost/$zhuip/g" /etc/Kyun/kyun.conf 
+sed -i "s/localhost/$zhuip/g" /Data/wwwroot/Kyun/Data/config.php
+sed -i "s/localhost/$zhuip/g" /Data/wwwroot/Kyun/Kyws/config.php
+echo
+vpn
+echo && echo -e "恭喜你已完成服务器负载。"
+exit 0
+elif [[ $install == 3 ]];then
+  # 加载系统配置
+  source /etc/Kyun/kyun.conf
+  clear
+  echo -e -n "\033[34m你需要导入还是导出数据？(1导出/2导入)\033[0m"
+  read caozuo
+  if [ $caozuo == '1' ];then
+    echo -e -n "\033[34m只要导出用户数据吗？(y/n)\033[0m"
+    read user
+    if [[ $user == 'y' || $user == 'Y' ]];then
+       mysqldump -u$Kyun_USER -p$Kyun_PASS $Kyun_NAME openvpn > /Data/wwwroot/Kyun/Ky.sql
+    else
+       mysqldump -u$Kyun_USER -p$Kyun_PASS $Kyun_NAME > /Data/wwwroot/Kyun/Ky.sql
+	   # 获取httpd端口
+       weba=`netstat -ntlp|grep httpd|awk '{print $4}'`
+       webb=${weba/:::/}
+       webdk=${webb/0.0.0.0:/}
+       echo && echo -e "数据下载地址：http://$IP:$webdk/Ky.sql"
+    fi 
+  else
+    echo -e "请到备份好的数据上传到服务器root目录下,并命名为Ky.sql(如：/root/Ky.sql)"
+	mysql -u$Kyun_USER -p$Kyun_PASS $Kyun_NAME < /root/Ky.sql
+	echo && echo -e "恭喜你已完成数据导入！"
+  fi
+  exit 0
+elif [[ $install == 4 ]];then
+  clear
+  echo -e -n "\033[34m请输入APP名称：\033[0m"
+  read appname
+  echo
+  echo -e -n "\033[34m请输入代理ID：\033[0m"
+  read dlapp
+  echo -n -e "你想自定义APP图标和启动图吗？(y/n)："
+  read userimg
+  if [[ $userimg == 'y' || $userimg == 'Y' ]];then
+    img=yes
+    # APP软件图标
+    echo
+    echo -n -e "请输入APP图标地址 [默认:快云Logo图标 ]"
+    read urlA
+    if [ -z $urlA ];then 
+      img=no
+    fi
+
+    # APP启动图
+    echo
+    echo -n -e "请输入APP启动图地址 [默认:快云启动图 ]"
+    read urlB
+    if [ -z $urlB ];then 
+      img=no
+    fi
+  else
+    img=no
+  fi
+  mkdir /home/android 
+  chmod 0777 -R /home/android 
+  cd /home/android
+  wget -q ${web}$Host/apktool.jar
+  wget -q ${web}$Host/DlAPP.apk
+  # 获取httpd端口
+  weba=`netstat -ntlp|grep httpd|awk '{print $4}'`
+  webb=${weba/:::/}
+  webdk=${webb/0.0.0.0:/}
+  # 反编译
+  echo && echo -e "正在反编译APP..."
+  java -jar apktool.jar d DlAPP.apk >/dev/null 2>&1 
+
+  sed -i 's/'wap.kuaiyum.com:8888'/'${IP}:${webdk}'/g' "/home/android/DlAPP/smali/net/openvpn/openvpn/base.smali"
+  sed -i 's/'wap.kuaiyum.com:8888'/'${IP}:${webdk}'/g' "/home/android/DlAPP/smali/net/openvpn/openvpn/OpenVPNClient.smali" 
+  sed -i 's/'wap.kuaiyum.com:8888'/'${IP}:${webdk}'/g' "/home/android/DlAPP/smali/net/openvpn/openvpn/OpenVPNClient\$10.smali" 
+  sed -i 's/'wap.kuaiyum.com:8888'/'${IP}:${webdk}'/g' "/home/android/DlAPP/smali/net/openvpn/openvpn/OpenVPNClient\$11.smali" 
+  sed -i 's/'wap.kuaiyum.com:8888'/'${IP}:${webdk}'/g' "/home/android/DlAPP/smali/net/openvpn/openvpn/OpenVPNClient\$13.smali" 
+  sed -i 's/'wap.kuaiyum.com:8888'/'${IP}:${webdk}'/g' "/home/android/DlAPP/smali/net/openvpn/openvpn/Main2Activity\$MyListener\$1.smali" 
+  sed -i 's/'wap.kuaiyum.com:8888'/'${IP}:${webdk}'/g' '/home/android/DlAPP/smali/net/openvpn/openvpn/Main2Activity$MyListener.smali' 
+  sed -i 's/'wap.kuaiyum.com:8888'/'${IP}:${webdk}'/g' '/home/android/DlAPP/smali/net/openvpn/openvpn/MainActivity.smali' 
+  sed -i 's/'wap.kuaiyum.com:8888'/'${IP}:${webdk}'/g' '/home/android/DlAPP/smali/net/openvpn/openvpn/update$myClick$1.smali'
+  sed -i 's/'wap.kuaiyum.com:8888'/'${IP}:${webdk}'/g' '/home/android/DlAPP/smali/net/openvpn/openvpn/AutoScrollTextView.smali' 
+  sed -i 's/快云流量/'$appname'/g' "/home/android/DlAPP/res/values/strings.xml"
+  sed -i 's/dlapp=1797106720/'dlapp=$dlapp'/g' "/home/android/DlAPP/smali/net/openvpn/openvpn/OpenVPNClient.smali" 
+  sed -i 's/dlapp=1797106720/'dlapp=$dlapp'/g' "/home/android/DlAPP/smali/net/openvpn/openvpn/OpenVPNClient\$13.smali" 
+  
+  if [[ $img == 'yes' ]];then
+    # 图标
+    rm -rf /home/android/DlAPP/res/drawable-hdpi-v4/icon.png
+    rm -rf /home/android/DlAPP/res/drawable-mdpi-v4/icon.png
+    rm -rf /home/android/DlAPP/res/drawable-xhdpi-v4/icon.png
+    wget -q -O /home/android/DlAPP/res/drawable-xhdpi-v4/icon.png $urlA
+    cp /home/android/DlAPP/res/drawable-xhdpi-v4/icon.png /home/android/DlAPP/res/drawable-mdpi-v4/icon.png
+    cp /home/android/DlAPP/res/drawable-xhdpi-v4/icon.png /home/android/DlAPP/res/drawable-hdpi-v4/icon.png
+
+    # 启动图
+    rm -rf /home/android/DlAPP/res/drawable/splash.png
+    wget -q -O /home/android/DlAPP/res/drawable/splash.png $urlB
+  fi
+
+  # 打包
+  echo && echo -e "正在签名打包APP..."
+  chmod +x /home/android/apktool.jar
+  java -jar apktool.jar b DlAPP >/dev/null 2>&1
+  cd /home/android/DlAPP/dist
+  wget -q ${web}$Host/signer.tar.gz
+  tar zxf signer.tar.gz
+  java -jar signapk.jar testkey.x509.pem testkey.pk8 DlAPP.apk app.apk >/dev/null 2>&1 
+  NowTime=`date +%Y%m%d%H%M`
+  cp -rf /home/android/DlAPP/dist/app.apk /Data/wwwroot/Kyun/user/app/$NowTime\.apk
+  rm -rf /home/*
+  echo
+  echo "软件下载地址：http://$IP:$webdk/user/app/$NowTime.apk"
+  exit 0
+elif [[ $install == 5 ]];then
+  clear
+  printf "\033[31m----------------------------------------------------------\n\n目前只支持N17-6.4升到N17-6.6,低于V6.4版本的请立即终止！！！\n\n----------------------------------------------------------\033[0m"
+  echo -e -n "\033[34m\n清楚明白,回车继续\033[0m"
+  read
+  # 加载系统配置
+  source /etc/Kyun/kyun.conf
+  #echo -e '正在为您备份用户数据...\n'
+  #mysqldump -u$Kyun_USER -p$Kyun_PASS $Kyun_NAME openvpn > /mnt/openvpn.sql
+  #echo -e '正在为您备份卡密数据...\n'
+  #mysqldump -u$Kyun_USER -p$Kyun_PASS $Kyun_NAME auth_kms > /mnt/auth_kms.sql
+  #echo -e '正在为您备份线路数据...\n'
+  #mysqldump -u$Kyun_USER -p$Kyun_PASS $Kyun_NAME line > /mnt/line.sql
+  #echo -e '正在为您备份排行榜数据...\n'
+  #mysqldump -u$Kyun_USER -p$Kyun_PASS $Kyun_NAME top > /mnt/top.sql
+  echo -e '\n正在为您备份系统文件...\n'
+  cp /Data/wwwroot/Kyun/Data/config.php /mnt/config_one.php.bak
+  cp /Data/wwwroot/Kyun/Kyws/config.php /mnt/config_two.php.bak
+  mv /Data/wwwroot/Kyun/mysql_* /mnt
+  rm -rf /Data/wwwroot/Kyun/*
+  echo -e '正在更新WEB文件...\n'
+  cd /Data/wwwroot/Kyun 
+  wget -q ${web}$Host/$KyWEB 
+  unzip -q $KyWEB 
+  rm -rf $KyWEB 
+  rm -rf /Data/wwwroot/Kyun/Data/config.php 
+  rm -rf /Data/wwwroot/Kyun/Kyws/config.php 
+  mv /mnt/mysql_*   /Data/wwwroot/Kyun/
+  mv /mnt/config_one.php.bak /Data/wwwroot/Kyun/Data/config.php 
+  mv /mnt/config_two.php.bak /Data/wwwroot/Kyun/Kyws/config.php 
+  cd /mnt 
+  wget -q ${web}$Host/gxsql.sql
+  sed -i 's/hunan.kuaiyum.com:8888/'$IP:$webdk'/g' /mnt/gxsql.sql
+  sed -i 's/hunan.kuaiyum.com/'$IP'/g' /mnt/gxsql.sql
+  mysql -u$Kyun_USER -p$Kyun_PASS $Kyun_NAME < /mnt/gxsql.sql
+  echo -e '正在更新系统文件...\n'
+  cd /etc/openvpn 
+  wget -q ${web}$Host/$peizhi
+  unzip -q $peizhi 
+  rm -rf *.conf 
+  mv K/*.conf /etc/openvpn
+  chmod 0777 /etc/openvpn/*
+  rm -rf /bin/vpn 
+  mv /etc/openvpn/K/vpn /bin/vpn
+  rm -rf /bin/Kps 
+  mv /etc/openvpn/K/Kps /bin/Kps
+  rm -rf /etc/Kyun/*.sh
+  mv /etc/openvpn/K/*.sh /etc/Kyun
+  chmod 0777 /etc/Kyun/* 
+  rm -rf /bin/K666
+  wget -q ${web}$Host/K666
+  mv K666 /bin/K666
+  chmod 0777 /bin/*
+  vpn
+  chmod 0777 /Data/wwwroot/Kyun/Online/*
+  #echo -e '正在为您恢复用户数据...\n'
+  #mysql -u$Kyun_USER -p$Kyun_PASS $Kyun_NAME < /mnt/openvpn.sql
+  #echo -e '正在为您恢复卡密数据...\n'
+  #mysql -u$Kyun_USER -p$Kyun_PASS $Kyun_NAME < /mnt/auth_kms.sql
+  #echo -e '正在为您恢复线路数据...\n'
+  #mysql -u$Kyun_USER -p$Kyun_PASS $Kyun_NAME < /mnt/line.sql
+  #echo -e '正在为您恢复排行榜数据...\n'
+  #mysql -u$Kyun_USER -p$Kyun_PASS $Kyun_NAME < /mnt/top.sql
+  clear
+  printf "\033[34m--------------------------------------------\n\n恭喜你已成功升级到最新版V6.6，赶快去体验吧\n\n--------------------------------------------\033[0m"
+  exit 0
+elif [[ $install == 6 ]];then
+  clear
+  echo "开始卸载流控系统.."
+  rm -rf /Data 
+  rm -rf /etc/Kyun
+  rm -rf /etc/openvpn 
+  rm -rf /bin/Ky 
+  rm -rf /bin/Kps
+  rm -rf /bin/vpn
+  rm -rf /bin/K666
+  rm -rf /var/lib/mysql
+  killall K666
+  killall Ky 
+  killall Kps
+  systemctl stop openvpn@server-*.service
+  systemctl stop httpd.service 
+  systemctl stop mariadb.service
+  yum remove -y openvpn httpd mariadb-server mariadb
+  yum remove -y php php-mysql php-gd libjpeg* php-ldap php-odbc php-pear php-xml php-xmlrpc php-mbstring php-bcmath php-mhash php-fpm
+  echo '卸载完成，欢迎你下次再使用哦。'
+  exit 0
+else
+  KyunClear
+  KyunVPN
+  KyunWeb
+  KyunApp
+  LASTLINE=`date +"%Y-%m-%d %H:%M:%S"`; # 获取结束时间
+  Sys_data=`date -d  "$CURTIME" +%s` # 获取开始时间阀
+  In_data=`date -d  "$LASTLINE" +%s`; # 获取结束时间阀
+  all_time=`expr $In_data - $Sys_data`; #计算总时间差
+  # 置为开机自启
+  echo && echo -e "正在置为开机自启..."
+  systemctl enable crond.service >/dev/null 2>&1
+  systemctl enable iptables.service >/dev/null 2>&1
+  systemctl enable httpd.service >/dev/null 2>&1 
+  echo "#!/bin/bash
+touch /var/lock/subsys/local
+vpn
+bash /Data/start.sh " >>/etc/rc.local
+  chmod +x /etc/rc.d/rc.local
+  echo "#!/bin/bash
+# 快云开机自启脚本 请自行添加">>/Data/start.sh
+  rm -rf /root/.local
+  rm -rf /home/* && rm -rf /root/* 
+  rm -rf /Data/wwwroot/Kyun/*.sql
+  if [ $NowV != '4.13.7-1.el7.elrepo.x86_64' ];then
+    if [ -e "/opt/BBR_elrepo_install" ];then
+      elrepo='你已经升级过内核啦,请手动重启服务器即可生效,重启服务器命令：reboot'
+    else
+      elrepo='请你手动重启服务器用于激活为你升级的最新内核，重启服务器命令：reboot'
+    fi
+  else
+    elrepo='欢迎你使用快云VPN产品,如果你有Bug和好的建议反馈给我们，欢迎联系邮箱：fyuewl@qq.com'
+  fi
+fi
+clear
+echo -e "
+---------------------------------------------------------
+     欢迎您使用快云免流两分钟极速一键VPN搭建脚本     
+---------------------------------------------------------
+流量前台地址：http://$IP:$webdk/user
+代理后台地址：http://$IP:$webdk/daili
+管理员后台地址：http://$IP:$webdk/admin
+软件下载地址：http://$IP:$webdk/user/app
+数据库地址为：http://$IP:$webdk/$sql 
+---------------------------------------------------------
+---------------------------------------------------------
+你本次安装快云VPN程序一共花费时间 $all_time 秒
+管理员账号：$adminuser         管理员密码：$adminpass 
+本地二级密码：$admintwopass       数据库密码：$sqlpass
+
+博客地址：blog.67cc.cn
+---------------------------------------------------------
+---------------------------------------------------------
+温馨提示：每天自动备份的数据在(/Data/Backups),记得及时下载保存哦
+$elrepo
+----------------------------------------------------------"
+return 1
+}
+
+Kyun
+
+exit 0
+
+# By Fyue/飞跃 
+# 2017年10月28日
+# 本脚本版权归快云免流所有
